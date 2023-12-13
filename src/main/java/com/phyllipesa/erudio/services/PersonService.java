@@ -1,6 +1,8 @@
 package com.phyllipesa.erudio.services;
 
 import com.phyllipesa.erudio.data.vo.v1.PersonVO;
+import com.phyllipesa.erudio.exceptions.RequiredObjectIsNullException;
+import com.phyllipesa.erudio.exceptions.ResourceNotFoundException;
 import com.phyllipesa.erudio.mapper.EntityMapper;
 import com.phyllipesa.erudio.models.Person;
 import com.phyllipesa.erudio.repositories.PersonRepository;
@@ -29,11 +31,14 @@ public class PersonService {
 
   public PersonVO findById(Long id) {
     logger.info("Finding a person!");
-    PersonVO person = entityMapper.parseObject(personRepository.findById(id), PersonVO.class);
+    Person p = personRepository.findById(id)
+        .orElseThrow(() -> new ResourceNotFoundException("No record found for this ID!"));
+    PersonVO person = entityMapper.parseObject(p, PersonVO.class);
     return person;
   }
 
   public PersonVO create(PersonVO personVO) {
+    if (personVO == null) throw new RequiredObjectIsNullException();
     logger.info("Creating one person!");
     Person person = entityMapper.parseObject(personVO, Person.class);
     PersonVO newPerson = entityMapper.parseObject(personRepository.save(person), PersonVO.class);
@@ -41,9 +46,11 @@ public class PersonService {
   }
 
   public PersonVO update(PersonVO personVO) {
+    if (personVO == null) throw new RequiredObjectIsNullException();
     logger.info("Update one person!");
 
-    Person entity = personRepository.findById(personVO.getKey()).orElseThrow();
+    Person entity = personRepository.findById(personVO.getKey())
+        .orElseThrow(() -> new ResourceNotFoundException("No records found for this ID!"));
 
     entity.setFirstName(personVO.getFirstName());
     entity.setLastName(personVO.getLastName());
@@ -56,7 +63,8 @@ public class PersonService {
 
   public void delete(Long id) {
     logger.info("Deleting a person!");
-    Person entity = personRepository.findById(id).orElseThrow();
+    Person entity = personRepository.findById(id)
+        .orElseThrow(() -> new ResourceNotFoundException("No records found for this ID!"));;
     personRepository.delete(entity);
   }
 }
