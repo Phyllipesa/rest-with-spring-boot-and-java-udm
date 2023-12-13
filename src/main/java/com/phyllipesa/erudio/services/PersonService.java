@@ -26,4 +26,10 @@ public class PersonService {
     List<PersonVO> list = entityMapper.parseListObject(personRepository.findAll(), PersonVO.class);
     return list;
   }
+
+  public PersonVO findById(Long id) {
+    logger.info("Finding a person!");
+    PersonVO person = entityMapper.parseObject(personRepository.findById(id), PersonVO.class);
+    return person;
+  }
 }
