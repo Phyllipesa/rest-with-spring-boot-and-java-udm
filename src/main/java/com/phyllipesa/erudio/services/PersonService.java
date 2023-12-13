@@ -2,6 +2,7 @@ package com.phyllipesa.erudio.services;
 
 import com.phyllipesa.erudio.data.vo.v1.PersonVO;
 import com.phyllipesa.erudio.mapper.EntityMapper;
+import com.phyllipesa.erudio.models.Person;
 import com.phyllipesa.erudio.repositories.PersonRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,5 +32,12 @@ public class PersonService {
     logger.info("Finding a person!");
     PersonVO person = entityMapper.parseObject(personRepository.findById(id), PersonVO.class);
     return person;
+  }
+
+  public PersonVO create(PersonVO personVO) {
+    logger.info("Creating one person!");
+    Person person = entityMapper.parseObject(personVO, Person.class);
+    PersonVO newPerson = entityMapper.parseObject(personRepository.save(person), PersonVO.class);
+    return  newPerson;
   }
 }
