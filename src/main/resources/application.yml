@@ -7,7 +7,7 @@ spring:
   jpa:
     open-in-view: true
     hibernate:
-      ddl-auto: update
+      ddl-auto: none
     show-sql: false
 spring-doc:
   pathsToMatch: /api/**/**
