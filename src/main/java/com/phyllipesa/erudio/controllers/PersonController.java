@@ -17,23 +17,23 @@ public class PersonController {
   PersonService service;
 
   @GetMapping
-  public List<PersonVO> findAll() {
-    return service.findAll();
+  public ResponseEntity<List<PersonVO>> findAll() {
+    return ResponseEntity.ok(service.findAll());
   }
 
   @GetMapping("/{id}")
-  public PersonVO findById(@PathVariable(value = "id") Long id) {
-    return service.findById(id);
+  public ResponseEntity<PersonVO> findById(@PathVariable(value = "id") Long id) {
+    return ResponseEntity.ok(service.findById(id));
   }
 
   @PostMapping
-  public PersonVO create(@RequestBody PersonVO person) {
-    return service.create(person);
+  public ResponseEntity<PersonVO> create(@RequestBody PersonVO person) {
+    return ResponseEntity.status(201).body(service.create(person));
   }
 
   @PutMapping
-  public PersonVO update(@RequestBody PersonVO person) {
-    return service.update(person);
+  public ResponseEntity<PersonVO> update(@RequestBody PersonVO person) {
+    return ResponseEntity.status(200).body(service.update(person));
   }
 
   @DeleteMapping("/{id}")
