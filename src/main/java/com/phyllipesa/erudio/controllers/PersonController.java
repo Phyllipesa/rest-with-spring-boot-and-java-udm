@@ -2,6 +2,7 @@ package com.phyllipesa.erudio.controllers;
 
 import com.phyllipesa.erudio.data.vo.v1.PersonVO;
 import com.phyllipesa.erudio.services.PersonService;
+import com.phyllipesa.erudio.util.MediaType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,8 +18,9 @@ public class PersonController {
 
   @GetMapping(
       produces = {
-          com.phyllipesa.erudio.util.MediaType.APPLICATION_JSON,
-          com.phyllipesa.erudio.util.MediaType.APPLICATION_XML
+          MediaType.APPLICATION_JSON,
+          MediaType.APPLICATION_XML,
+          MediaType.APPLICATION_YML
       }
   )
   public ResponseEntity<List<PersonVO>> findAll() {
@@ -28,8 +30,9 @@ public class PersonController {
   @GetMapping(
       value = "/{id}",
       produces = {
-          com.phyllipesa.erudio.util.MediaType.APPLICATION_JSON,
-          com.phyllipesa.erudio.util.MediaType.APPLICATION_XML
+          MediaType.APPLICATION_JSON,
+          MediaType.APPLICATION_XML,
+          MediaType.APPLICATION_YML
       }
   )
   public ResponseEntity<PersonVO> findById(@PathVariable(value = "id") Long id) {
@@ -38,12 +41,14 @@ public class PersonController {
 
   @PostMapping(
       consumes = {
-          com.phyllipesa.erudio.util.MediaType.APPLICATION_JSON,
-          com.phyllipesa.erudio.util.MediaType.APPLICATION_XML
+          MediaType.APPLICATION_JSON,
+          MediaType.APPLICATION_XML,
+          MediaType.APPLICATION_YML
       },
       produces = {
-          com.phyllipesa.erudio.util.MediaType.APPLICATION_JSON,
-          com.phyllipesa.erudio.util.MediaType.APPLICATION_XML
+          MediaType.APPLICATION_JSON,
+          MediaType.APPLICATION_XML,
+          MediaType.APPLICATION_YML
       }
   )
   public ResponseEntity<PersonVO> create(@RequestBody PersonVO person) {
@@ -52,12 +57,14 @@ public class PersonController {
 
   @PutMapping(
       consumes = {
-          com.phyllipesa.erudio.util.MediaType.APPLICATION_JSON,
-          com.phyllipesa.erudio.util.MediaType.APPLICATION_XML
+          MediaType.APPLICATION_JSON,
+          MediaType.APPLICATION_XML,
+          MediaType.APPLICATION_YML
       },
       produces = {
-          com.phyllipesa.erudio.util.MediaType.APPLICATION_JSON,
-          com.phyllipesa.erudio.util.MediaType.APPLICATION_XML
+          MediaType.APPLICATION_JSON,
+          MediaType.APPLICATION_XML,
+          MediaType.APPLICATION_YML
       }
   )
   public ResponseEntity<PersonVO> update(@RequestBody PersonVO person) {
