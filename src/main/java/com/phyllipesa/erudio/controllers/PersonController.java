@@ -16,22 +16,33 @@ public class PersonController {
   @Autowired
   PersonService service;
 
-  @GetMapping
+  @GetMapping(
+      produces = MediaType.APPLICATION_JSON_VALUE
+  )
   public ResponseEntity<List<PersonVO>> findAll() {
     return ResponseEntity.ok(service.findAll());
   }
 
-  @GetMapping("/{id}")
+  @GetMapping(
+      value = "/{id}",
+      produces = MediaType.APPLICATION_JSON_VALUE
+  )
   public ResponseEntity<PersonVO> findById(@PathVariable(value = "id") Long id) {
     return ResponseEntity.ok(service.findById(id));
   }
 
-  @PostMapping
+  @PostMapping(
+      consumes = MediaType.APPLICATION_JSON_VALUE,
+      produces = MediaType.APPLICATION_JSON_VALUE
+  )
   public ResponseEntity<PersonVO> create(@RequestBody PersonVO person) {
     return ResponseEntity.status(201).body(service.create(person));
   }
 
-  @PutMapping
+  @PutMapping(
+      consumes = MediaType.APPLICATION_JSON_VALUE,
+      produces = MediaType.APPLICATION_JSON_VALUE
+  )
   public ResponseEntity<PersonVO> update(@RequestBody PersonVO person) {
     return ResponseEntity.status(200).body(service.update(person));
   }
