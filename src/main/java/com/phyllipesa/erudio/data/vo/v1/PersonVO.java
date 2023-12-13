@@ -2,13 +2,14 @@ package com.phyllipesa.erudio.data.vo.v1;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import org.springframework.hateoas.RepresentationModel;
 
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.Objects;
 
 @JsonPropertyOrder({ "id", "firstName", "lastName", "address", "gender" })
-public class PersonVO implements Serializable {
+public class PersonVO extends RepresentationModel<PersonVO> implements Serializable {
 
   @Serial
   private static final long serialVersionUID = 1L;
