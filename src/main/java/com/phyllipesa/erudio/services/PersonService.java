@@ -4,7 +4,6 @@ import com.phyllipesa.erudio.data.vo.v1.PersonVO;
 import com.phyllipesa.erudio.mapper.EntityMapper;
 import com.phyllipesa.erudio.models.Person;
 import com.phyllipesa.erudio.repositories.PersonRepository;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -39,5 +38,19 @@ public class PersonService {
     Person person = entityMapper.parseObject(personVO, Person.class);
     PersonVO newPerson = entityMapper.parseObject(personRepository.save(person), PersonVO.class);
     return  newPerson;
+  }
+
+  public PersonVO update(PersonVO personVO) {
+    logger.info("Update one person!");
+
+    Person entity = personRepository.findById(personVO.getKey()).orElseThrow();
+
+    entity.setFirstName(personVO.getFirstName());
+    entity.setLastName(personVO.getLastName());
+    entity.setAddress(personVO.getAddress());
+    entity.setGender(personVO.getGender());
+
+    PersonVO vo = entityMapper.parseObject(personRepository.save(entity), PersonVO.class);
+    return  vo;
   }
 }

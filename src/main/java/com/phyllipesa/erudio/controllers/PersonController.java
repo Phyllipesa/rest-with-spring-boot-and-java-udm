@@ -25,8 +25,13 @@ public class PersonController {
     return service.findById(id);
   }
 
-  @PostMapping()
+  @PostMapping
   public PersonVO create(@RequestBody PersonVO person) {
     return service.create(person);
+  }
+
+  @PutMapping
+  public PersonVO update(@RequestBody PersonVO person) {
+    return service.update(person);
   }
 }
