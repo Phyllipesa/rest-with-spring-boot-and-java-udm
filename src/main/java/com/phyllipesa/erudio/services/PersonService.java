@@ -53,4 +53,10 @@ public class PersonService {
     PersonVO vo = entityMapper.parseObject(personRepository.save(entity), PersonVO.class);
     return  vo;
   }
+
+  public void delete(Long id) {
+    logger.info("Deleting a person!");
+    Person entity = personRepository.findById(id).orElseThrow();
+    personRepository.delete(entity);
+  }
 }

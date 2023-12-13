@@ -4,6 +4,7 @@ import com.phyllipesa.erudio.data.vo.v1.PersonVO;
 import com.phyllipesa.erudio.services.PersonService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -33,5 +34,11 @@ public class PersonController {
   @PutMapping
   public PersonVO update(@RequestBody PersonVO person) {
     return service.update(person);
+  }
+
+  @DeleteMapping("/{id}")
+  public ResponseEntity<?> delete(@PathVariable(value = "id") Long id) {
+    service.delete(id);
+    return ResponseEntity.noContent().build();
   }
 }
