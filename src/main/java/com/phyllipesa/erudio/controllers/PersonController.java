@@ -1,6 +1,6 @@
 package com.phyllipesa.erudio.controllers;
 
-import com.phyllipesa.erudio.models.Person;
+import com.phyllipesa.erudio.data.vo.v1.PersonVO;
 import com.phyllipesa.erudio.services.PersonService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,7 +17,7 @@ public class PersonController {
   PersonService service;
 
   @GetMapping
-  public List<Person> findAll() {
+  public List<PersonVO> findAll() {
     return service.findAll();
   }
 }

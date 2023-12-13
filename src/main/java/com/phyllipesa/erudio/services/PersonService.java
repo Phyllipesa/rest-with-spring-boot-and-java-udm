@@ -1,7 +1,9 @@
 package com.phyllipesa.erudio.services;
 
-import com.phyllipesa.erudio.models.Person;
+import com.phyllipesa.erudio.data.vo.v1.PersonVO;
+import com.phyllipesa.erudio.mapper.EntityMapper;
 import com.phyllipesa.erudio.repositories.PersonRepository;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,8 +18,12 @@ public class PersonService {
   @Autowired
   PersonRepository personRepository;
 
-  public List<Person> findAll() {
-    logger.info("Findinf all people!");
-    return personRepository.findAll();
+  @Autowired
+  EntityMapper entityMapper;
+
+  public List<PersonVO> findAll() {
+    logger.info("Finding all people!");
+    List<PersonVO> list = entityMapper.parseListObject(personRepository.findAll(), PersonVO.class);
+    return list;
   }
 }
