@@ -1,0 +1,19 @@
+server:
+  port: 8888
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    open-in-view: true
+    hibernate:
+      ddl-auto: none
+    show-sql: false
+spring-doc:
+  pathsToMatch: /api/**/**/**
+  swagger-ui:
+    user-root-path: true
+
+# Configuração específica do Flyway
+flyway:
+  enabled: true
+  locations: classpath:db.migration
