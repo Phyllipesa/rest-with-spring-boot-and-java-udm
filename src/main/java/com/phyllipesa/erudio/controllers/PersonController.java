@@ -50,6 +50,7 @@ public class PersonController {
     return ResponseEntity.ok(service.findAll());
   }
 
+  @CrossOrigin(origins = "http://localhost:8080")
   @GetMapping(
     value = "/{id}",
     produces = {
@@ -77,6 +78,7 @@ public class PersonController {
     return ResponseEntity.ok(service.findById(id));
   }
 
+  @CrossOrigin(origins = { "http://localhost:8080", "http://phyllipesa.com.br" })
   @PostMapping(
     consumes = {
       MediaType.APPLICATION_JSON,
