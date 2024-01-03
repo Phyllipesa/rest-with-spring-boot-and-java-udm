@@ -60,23 +60,23 @@ public class PersonControllerJsonTest extends AbstractIntegrationTest {
           .body()
             .asString();
 
-    PersonVO createPerson = objectMapper.readValue(content, PersonVO.class);
-    person = createPerson;
+    PersonVO persistedPerson = objectMapper.readValue(content, PersonVO.class);
+    person = persistedPerson;
 
-    assertNotNull(createPerson);
+    assertNotNull(persistedPerson);
 
-    assertNotNull(createPerson.getId());
-    assertNotNull(createPerson.getFirstName());
-    assertNotNull(createPerson.getLastName());
-    assertNotNull(createPerson.getAddress());
-    assertNotNull(createPerson.getGender());
+    assertNotNull(persistedPerson.getId());
+    assertNotNull(persistedPerson.getFirstName());
+    assertNotNull(persistedPerson.getLastName());
+    assertNotNull(persistedPerson.getAddress());
+    assertNotNull(persistedPerson.getGender());
 
-		assertTrue(createPerson.getId() > 0);
+		assertTrue(persistedPerson.getId() > 0);
 
-    assertEquals("Richard", createPerson.getFirstName());
-    assertEquals("Stallman", createPerson.getLastName());
-    assertEquals("New York City, New York, US", createPerson.getAddress());
-    assertEquals("Male", createPerson.getGender());
+    assertEquals("Richard", persistedPerson.getFirstName());
+    assertEquals("Stallman", persistedPerson.getLastName());
+    assertEquals("New York City, New York, US", persistedPerson.getAddress());
+    assertEquals("Male", persistedPerson.getGender());
 	}
 
   @Test
@@ -115,4 +115,49 @@ public class PersonControllerJsonTest extends AbstractIntegrationTest {
 		person.setAddress("New York City, New York, US");
 		person.setGender("Male");
 	}
+
+  @Test
+  @Order(3)
+  public void testFindById() throws JsonProcessingException {
+    mockPerson();
+
+    specification = new RequestSpecBuilder()
+      .addHeader(TestConfigs.HEADER_PARAM_ORIGIN, TestConfigs.ORIGIN_PHYLLIPESA)
+      .setBasePath("/api/person")
+      .setPort(TestConfigs.SERVER_PORT)
+        .addFilter(new RequestLoggingFilter(LogDetail.ALL))
+        .addFilter(new ResponseLoggingFilter(LogDetail.ALL))
+      .build();
+
+    var content =
+      given()
+        .spec(specification)
+        .contentType(TestConfigs.CONTENT_TYPE_JSON)
+          .pathParam("id", person.getId())
+        .when()
+          .get("{id}")
+        .then()
+          .statusCode(200)
+        .extract()
+          .body()
+            .asString();
+
+    PersonVO persistedPerson = objectMapper.readValue(content, PersonVO.class);
+    person = persistedPerson;
+
+    assertNotNull(persistedPerson);
+
+    assertNotNull(persistedPerson.getId());
+    assertNotNull(persistedPerson.getFirstName());
+    assertNotNull(persistedPerson.getLastName());
+    assertNotNull(persistedPerson.getAddress());
+    assertNotNull(persistedPerson.getGender());
+
+    assertTrue(persistedPerson.getId() > 0);
+
+    assertEquals("Richard", persistedPerson.getFirstName());
+    assertEquals("Stallman", persistedPerson.getLastName());
+    assertEquals("New York City, New York, US", persistedPerson.getAddress());
+    assertEquals("Male", persistedPerson.getGender());
+  }
 }
