@@ -40,7 +40,7 @@ public class PersonControllerJsonTest extends AbstractIntegrationTest {
 		mockPerson();
 
 		specification = new RequestSpecBuilder()
-      .addHeader(TestConfigs.HEADER_PARAM_ORIGIN, "http://phyllipesa.com.br")
+      .addHeader(TestConfigs.HEADER_PARAM_ORIGIN, TestConfigs.ORIGIN_PHYLLIPESA)
       .setBasePath("/api/person")
       .setPort(TestConfigs.SERVER_PORT)
         .addFilter(new RequestLoggingFilter(LogDetail.ALL))
@@ -52,7 +52,7 @@ public class PersonControllerJsonTest extends AbstractIntegrationTest {
         .spec(specification)
         .contentType(TestConfigs.CONTENT_TYPE_JSON)
           .body(person)
-          .when()
+        .when()
           .post()
         .then()
           .statusCode(201)
@@ -78,6 +78,36 @@ public class PersonControllerJsonTest extends AbstractIntegrationTest {
     assertEquals("New York City, New York, US", createPerson.getAddress());
     assertEquals("Male", createPerson.getGender());
 	}
+
+  @Test
+  @Order(2)
+  public void testCreateWithWrongOrigin() throws JsonProcessingException {
+    mockPerson();
+
+    specification = new RequestSpecBuilder()
+      .addHeader(TestConfigs.HEADER_PARAM_ORIGIN, TestConfigs.ORIGIN_SEMPSA)
+      .setBasePath("/api/person")
+      .setPort(TestConfigs.SERVER_PORT)
+        .addFilter(new RequestLoggingFilter(LogDetail.ALL))
+        .addFilter(new ResponseLoggingFilter(LogDetail.ALL))
+      .build();
+
+    var content =
+      given()
+        .spec(specification)
+        .contentType(TestConfigs.CONTENT_TYPE_JSON)
+          .body(person)
+        .when()
+          .post()
+        .then()
+          .statusCode(403)
+        .extract()
+            .body()
+              .asString();
+
+    assertNotNull(content);
+    assertEquals("Invalid CORS request", content);
+  }
 
 	private void mockPerson() {
 		person.setFirstName("Richard");
