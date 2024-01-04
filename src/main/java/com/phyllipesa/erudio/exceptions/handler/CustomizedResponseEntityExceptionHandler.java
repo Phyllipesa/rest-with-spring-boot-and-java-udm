@@ -1,6 +1,7 @@
 package com.phyllipesa.erudio.exceptions.handler;
 
 import com.phyllipesa.erudio.exceptions.ExceptionResponse;
+import com.phyllipesa.erudio.exceptions.InvalidAuthenticationException;
 import com.phyllipesa.erudio.exceptions.RequiredObjectIsNullException;
 import com.phyllipesa.erudio.exceptions.ResourceNotFoundException;
 import org.springframework.http.HttpStatus;
@@ -48,5 +49,16 @@ public class CustomizedResponseEntityExceptionHandler extends ResponseEntityExce
     );
 
     return new ResponseEntity<>(exceptionResponse, HttpStatus.BAD_REQUEST);
+  }
+
+  @ExceptionHandler(InvalidAuthenticationException.class)
+  public final ResponseEntity<ExceptionResponse> handleInvalidAuthenticationException(Exception e, WebRequest request) {
+    ExceptionResponse exceptionResponse = new ExceptionResponse(
+        new Date(),
+        e.getMessage(),
+        request.getDescription(false)
+    );
+
+    return new ResponseEntity<>(exceptionResponse, HttpStatus.FORBIDDEN);
   }
 }
