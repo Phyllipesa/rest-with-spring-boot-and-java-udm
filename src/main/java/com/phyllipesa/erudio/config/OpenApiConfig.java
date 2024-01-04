@@ -9,10 +9,10 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class OpenApiConfig {
   @Bean
-  public OpenAPI customOpenAPI() {
+  OpenAPI customOpenAPI() {
     return new OpenAPI()
       .info(new Info()
-      .title("RESTful API with Java 21 and Spring Boot 3")
+      .title("RESTful API with Java 21 and Spring Boot 3.2.0")
       .version("v1")
       .description("This API simulates basic registration of people to a MySQL database using CRUD.")
       .termsOfService("https://pub.example.com.br/erudio")
