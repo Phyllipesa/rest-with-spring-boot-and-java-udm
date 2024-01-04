@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS `users` (
-    `id` INT(20) AUTO_INCREMENT,
+    `id` INT AUTO_INCREMENT,
     `user_name` VARCHAR(255) DEFAULT NULL,
     `full_name` VARCHAR(255) DEFAULT NULL,
     `password` VARCHAR(255) DEFAULT NULL,
