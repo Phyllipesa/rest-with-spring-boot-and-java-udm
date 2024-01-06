@@ -1,5 +1,10 @@
 cors:
   originPatterns: http://localhost:3000,http://localhost:8080,https://phyllipesa.com.br
+security:
+  jwt:
+    token:
+      secret-key: 53ccr37
+      expire-length: 3600000
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -10,9 +15,11 @@ spring:
     open-in-view: true
     hibernate:
       ddl-auto: none
-    show-sql: false
+    show-sql: true
 spring-doc:
-  pathsToMatch: /api/**/**/**
+  pathsToMatch:
+    - /auth/**
+    - /api/**/v1/**
   swagger-ui:
     user-root-path: true
 
