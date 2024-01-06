@@ -1,9 +1,5 @@
 package com.phyllipesa.erudio.exceptions.handler;
 
-import com.phyllipesa.erudio.exceptions.ExceptionResponse;
-import com.phyllipesa.erudio.exceptions.InvalidAuthenticationException;
-import com.phyllipesa.erudio.exceptions.RequiredObjectIsNullException;
-import com.phyllipesa.erudio.exceptions.ResourceNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -11,6 +7,11 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+
+import com.phyllipesa.erudio.exceptions.ExceptionResponse;
+import com.phyllipesa.erudio.exceptions.InvalidJwtAuthenticationException;
+import com.phyllipesa.erudio.exceptions.RequiredObjectIsNullException;
+import com.phyllipesa.erudio.exceptions.ResourceNotFoundException;
 
 import java.util.Date;
 
@@ -51,13 +52,13 @@ public class CustomizedResponseEntityExceptionHandler extends ResponseEntityExce
     return new ResponseEntity<>(exceptionResponse, HttpStatus.BAD_REQUEST);
   }
 
-  @ExceptionHandler(InvalidAuthenticationException.class)
-  public final ResponseEntity<ExceptionResponse> handleInvalidAuthenticationException(Exception e, WebRequest request) {
+  @ExceptionHandler(InvalidJwtAuthenticationException.class)
+  public final ResponseEntity<ExceptionResponse> handleInvalidJwtAuthenticationExceptions(Exception e, WebRequest request) {
+
     ExceptionResponse exceptionResponse = new ExceptionResponse(
         new Date(),
         e.getMessage(),
-        request.getDescription(false)
-    );
+        request.getDescription(false));
 
     return new ResponseEntity<>(exceptionResponse, HttpStatus.FORBIDDEN);
   }

@@ -7,11 +7,11 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import java.io.Serial;
 
 @ResponseStatus(HttpStatus.FORBIDDEN)
-public class InvalidAuthenticationException extends AuthenticationException {
+public class InvalidJwtAuthenticationException extends AuthenticationException {
   @Serial
   private static final long serialVersionUID = 1L;
 
-  public InvalidAuthenticationException(String e) {
+  public InvalidJwtAuthenticationException(String e) {
     super(e);
   }
 }
