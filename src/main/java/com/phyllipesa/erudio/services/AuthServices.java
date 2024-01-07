@@ -24,6 +24,7 @@ public class AuthServices {
   @Autowired
   private UserRepository userRepository;
 
+  @SuppressWarnings("rawtypes")
   public ResponseEntity signIn(AccountCredentialsVO data) {
     try {
       var username = data.getUsername();
