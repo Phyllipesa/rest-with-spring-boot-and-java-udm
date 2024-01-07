@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS `permission` (
-    `id` INT AUTO_INCREMENT,
-    `description` VARCHAR(255) DEFAULT NULL,
-    PRIMARY KEY (`id`)
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `description` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB;
