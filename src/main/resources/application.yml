@@ -15,7 +15,7 @@ spring:
     open-in-view: true
     hibernate:
       ddl-auto: none
-    show-sql: true
+    show-sql: false
 spring-doc:
   pathsToMatch:
     - /auth/**
