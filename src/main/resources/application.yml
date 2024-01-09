@@ -17,6 +17,8 @@ spring:
       ddl-auto: none
     show-sql: false
 spring-doc:
+  cache:
+    disabled: true
   pathsToMatch:
     - /auth/**
     - /api/**/v1/**
