@@ -122,9 +122,9 @@ public class PersonControllerJsonTest extends AbstractIntegrationTest {
             .contentType(TestConfigs.CONTENT_TYPE_JSON)
             .body(person)
             .when()
-            .post()
+            .put()
             .then()
-            .statusCode(201)
+            .statusCode(200)
             .extract()
             .body()
             .asString();
