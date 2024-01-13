@@ -1,8 +1,6 @@
 package com.phyllipesa.erudio.integrationTests.vo;
 
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import jakarta.xml.bind.annotation.XmlRootElement;
-import org.springframework.hateoas.RepresentationModel;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -10,7 +8,7 @@ import java.util.Date;
 import java.util.Objects;
 
 @XmlRootElement
-public class BookVO extends RepresentationModel<BookVO> implements Serializable {
+public class BookVO implements Serializable {
 
   @Serial
   private static final long serialVersionUID = 1L;
