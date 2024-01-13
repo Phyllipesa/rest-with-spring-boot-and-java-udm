@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+
 import com.phyllipesa.erudio.configs.TestConfigs;
 import com.phyllipesa.erudio.integrationTests.testcontainers.AbstractIntegrationTest;
 import com.phyllipesa.erudio.integrationTests.vo.AccountCredentialsVO;
@@ -126,7 +127,7 @@ public class PersonControllerXmlTest extends AbstractIntegrationTest {
             .when()
             .post()
             .then()
-            .statusCode(201)
+            .statusCode(200)
             .extract()
             .body()
             .asString();
