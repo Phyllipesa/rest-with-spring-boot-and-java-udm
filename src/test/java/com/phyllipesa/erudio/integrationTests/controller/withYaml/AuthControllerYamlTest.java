@@ -1,11 +1,13 @@
 package com.phyllipesa.erudio.integrationTests.controller.withYaml;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+
 import com.phyllipesa.erudio.configs.TestConfigs;
 import com.phyllipesa.erudio.integrationTests.controller.withYaml.mapper.YMLMapper;
 import com.phyllipesa.erudio.integrationTests.testcontainers.AbstractIntegrationTest;
 import com.phyllipesa.erudio.integrationTests.vo.AccountCredentialsVO;
 import com.phyllipesa.erudio.integrationTests.vo.TokenVO;
+
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.config.EncoderConfig;
 import io.restassured.config.RestAssuredConfig;
@@ -13,6 +15,7 @@ import io.restassured.filter.log.LogDetail;
 import io.restassured.filter.log.RequestLoggingFilter;
 import io.restassured.filter.log.ResponseLoggingFilter;
 import io.restassured.http.ContentType;
+
 import io.restassured.specification.RequestSpecification;
 import org.junit.jupiter.api.*;
 import org.springframework.boot.test.context.SpringBootTest;

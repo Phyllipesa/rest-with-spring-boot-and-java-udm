@@ -10,19 +10,20 @@ import com.phyllipesa.erudio.integrationTests.vo.AccountCredentialsVO;
 import com.phyllipesa.erudio.integrationTests.vo.BookVO;
 import com.phyllipesa.erudio.integrationTests.vo.TokenVO;
 import io.restassured.builder.RequestSpecBuilder;
+import io.restassured.config.EncoderConfig;
+import io.restassured.config.RestAssuredConfig;
 import io.restassured.filter.log.LogDetail;
 import io.restassured.filter.log.RequestLoggingFilter;
 import io.restassured.filter.log.ResponseLoggingFilter;
+import io.restassured.http.ContentType;
 import io.restassured.specification.RequestSpecification;
 import org.junit.jupiter.api.*;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.List;
-import java.util.TimeZone;
 
 import static io.restassured.RestAssured.given;
 import static org.junit.jupiter.api.Assertions.*;
@@ -106,16 +107,13 @@ public class BookControllerJsonTest extends AbstractIntegrationTest {
     BookVO persistedBook = objectMapper.readValue(content, BookVO.class);
     book = persistedBook;
 
-    assertNotNull(persistedBook);
-
     assertNotNull(persistedBook.getId());
     assertNotNull(persistedBook.getAuthor());
     assertNotNull(persistedBook.getTitle());
     assertNotNull(persistedBook.getlaunchDate());
     assertNotNull(persistedBook.getPrice());
 
-    assertEquals(book.getId(), persistedBook.getId());
-
+    assertTrue(book.getId() > 0);
     assertEquals("Dany Evans", persistedBook.getAuthor());
     assertEquals("Domain-Driven Design: Tackling Complexity in the Heart of Software", persistedBook.getTitle());
     assertEquals(date, persistedBook.getlaunchDate());
@@ -143,16 +141,13 @@ public class BookControllerJsonTest extends AbstractIntegrationTest {
     BookVO persistedBook = objectMapper.readValue(content, BookVO.class);
     book = persistedBook;
 
-    assertNotNull(persistedBook);
-
     assertNotNull(persistedBook.getId());
     assertNotNull(persistedBook.getAuthor());
     assertNotNull(persistedBook.getTitle());
     assertNotNull(persistedBook.getlaunchDate());
     assertNotNull(persistedBook.getPrice());
 
-    assertEquals(book.getId(), persistedBook.getId());
-
+    assertTrue(book.getId() > 0);
     assertEquals("Eric Evans", persistedBook.getAuthor());
     assertEquals("Domain-Driven Design: Tackling Complexity in the Heart of Software", persistedBook.getTitle());
     assertEquals(date, persistedBook.getlaunchDate());
@@ -177,16 +172,13 @@ public class BookControllerJsonTest extends AbstractIntegrationTest {
     BookVO persistedBook = objectMapper.readValue(content, BookVO.class);
     book = persistedBook;
 
-    assertNotNull(persistedBook);
-
     assertNotNull(persistedBook.getId());
     assertNotNull(persistedBook.getAuthor());
     assertNotNull(persistedBook.getTitle());
     assertNotNull(persistedBook.getlaunchDate());
     assertNotNull(persistedBook.getPrice());
 
-    assertEquals(book.getId(), persistedBook.getId());
-
+    assertTrue(book.getId() > 0);
     assertEquals("Eric Evans", persistedBook.getAuthor());
     assertEquals("Domain-Driven Design: Tackling Complexity in the Heart of Software", persistedBook.getTitle());
     assertEquals(date, persistedBook.getlaunchDate());
@@ -224,7 +216,6 @@ public class BookControllerJsonTest extends AbstractIntegrationTest {
     book = books.get(0);
     sdf.applyPattern("yyyy-MM-dd HH:mm:ss.SSS");
     date = sdf.parse("2017-11-29 13:50:05.878");
-
     assertNotNull(book.getId());
     assertNotNull(book.getAuthor());
     assertNotNull(book.getTitle());
@@ -251,5 +242,24 @@ public class BookControllerJsonTest extends AbstractIntegrationTest {
     assertEquals("Refactoring", book.getTitle());
     assertEquals(date.toInstant(), book.getlaunchDate().toInstant());
     assertEquals(88.0, book.getPrice());
+  }
+
+  @Test
+  @Order(6)
+  public void testFindAllWithoutToken() throws JsonProcessingException {
+    RequestSpecification specificationWithoutToken = new RequestSpecBuilder()
+        .setBasePath("/api/person/v1")
+        .setPort(TestConfigs.SERVER_PORT)
+        .addFilter(new RequestLoggingFilter(LogDetail.ALL))
+        .addFilter(new ResponseLoggingFilter(LogDetail.ALL))
+        .build();
+
+    given()
+        .spec(specificationWithoutToken)
+        .contentType(TestConfigs.CONTENT_TYPE_JSON)
+        .when()
+        .get()
+        .then()
+        .statusCode(403);
   }
 }

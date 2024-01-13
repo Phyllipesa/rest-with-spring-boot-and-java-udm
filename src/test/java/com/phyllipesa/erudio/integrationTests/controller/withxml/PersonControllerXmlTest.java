@@ -10,11 +10,13 @@ import com.phyllipesa.erudio.integrationTests.testcontainers.AbstractIntegration
 import com.phyllipesa.erudio.integrationTests.vo.AccountCredentialsVO;
 import com.phyllipesa.erudio.integrationTests.vo.PersonVO;
 import com.phyllipesa.erudio.integrationTests.vo.TokenVO;
+
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.filter.log.LogDetail;
 import io.restassured.filter.log.RequestLoggingFilter;
 import io.restassured.filter.log.ResponseLoggingFilter;
 import io.restassured.specification.RequestSpecification;
+
 import org.junit.jupiter.api.*;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -96,9 +98,6 @@ public class PersonControllerXmlTest extends AbstractIntegrationTest {
 
     PersonVO persistedPerson = objectMapper.readValue(content, PersonVO.class);
     person = persistedPerson;
-
-    assertNotNull(persistedPerson);
-
     assertNotNull(persistedPerson.getId());
     assertNotNull(persistedPerson.getFirstName());
     assertNotNull(persistedPerson.getLastName());
@@ -106,7 +105,6 @@ public class PersonControllerXmlTest extends AbstractIntegrationTest {
     assertNotNull(persistedPerson.getGender());
 
     assertTrue(persistedPerson.getId() > 0);
-
     assertEquals("Nelson", persistedPerson.getFirstName());
     assertEquals("Piquet", persistedPerson.getLastName());
     assertEquals("Brasilia - DF, Brasil", persistedPerson.getAddress());
@@ -125,7 +123,7 @@ public class PersonControllerXmlTest extends AbstractIntegrationTest {
             .accept(TestConfigs.CONTENT_TYPE_XML)
             .body(person)
             .when()
-            .post()
+            .put()
             .then()
             .statusCode(200)
             .extract()
@@ -134,17 +132,13 @@ public class PersonControllerXmlTest extends AbstractIntegrationTest {
 
     PersonVO persistedPerson = objectMapper.readValue(content, PersonVO.class);
     person = persistedPerson;
-
-    assertNotNull(persistedPerson);
-
     assertNotNull(persistedPerson.getId());
     assertNotNull(persistedPerson.getFirstName());
     assertNotNull(persistedPerson.getLastName());
     assertNotNull(persistedPerson.getAddress());
     assertNotNull(persistedPerson.getGender());
 
-    assertEquals(person.getId(), persistedPerson.getId());
-
+    assertTrue(persistedPerson.getId() > 0);
     assertEquals("Nelson", persistedPerson.getFirstName());
     assertEquals("Piquet Souto Maior", persistedPerson.getLastName());
     assertEquals("Brasilia - DF, Brasil", persistedPerson.getAddress());
@@ -169,17 +163,13 @@ public class PersonControllerXmlTest extends AbstractIntegrationTest {
 
     PersonVO persistedPerson = objectMapper.readValue(content, PersonVO.class);
     person = persistedPerson;
-
-    assertNotNull(persistedPerson);
-
     assertNotNull(persistedPerson.getId());
     assertNotNull(persistedPerson.getFirstName());
     assertNotNull(persistedPerson.getLastName());
     assertNotNull(persistedPerson.getAddress());
     assertNotNull(persistedPerson.getGender());
 
-    assertEquals(person.getId(), persistedPerson.getId());
-
+    assertTrue(persistedPerson.getId() > 0);
     assertEquals("Nelson", persistedPerson.getFirstName());
     assertEquals("Piquet Souto Maior", persistedPerson.getLastName());
     assertEquals("Brasilia - DF, Brasil", persistedPerson.getAddress());
@@ -202,7 +192,6 @@ public class PersonControllerXmlTest extends AbstractIntegrationTest {
   @Test
   @Order(5)
   public void testFindAll() throws JsonProcessingException {
-
     var content =
         given()
             .spec(specification)
@@ -218,7 +207,6 @@ public class PersonControllerXmlTest extends AbstractIntegrationTest {
 
     List<PersonVO> people = objectMapper.readValue(content, new TypeReference<List<PersonVO>>() {});
     PersonVO foundPersonOne = people.get(0);
-
     assertNotNull(foundPersonOne.getId());
     assertNotNull(foundPersonOne.getFirstName());
     assertNotNull(foundPersonOne.getLastName());
@@ -226,14 +214,13 @@ public class PersonControllerXmlTest extends AbstractIntegrationTest {
     assertNotNull(foundPersonOne.getGender());
 
     assertEquals(1, foundPersonOne.getId());
-
     assertEquals("Ayrton", foundPersonOne.getFirstName());
     assertEquals("Senna", foundPersonOne.getLastName());
     assertEquals("São Paulo", foundPersonOne.getAddress());
     assertEquals("Male", foundPersonOne.getGender());
 
-    PersonVO foundPersonSix = people.get(5);
 
+    PersonVO foundPersonSix = people.get(5);
     assertNotNull(foundPersonSix.getId());
     assertNotNull(foundPersonSix.getFirstName());
     assertNotNull(foundPersonSix.getLastName());
@@ -241,7 +228,6 @@ public class PersonControllerXmlTest extends AbstractIntegrationTest {
     assertNotNull(foundPersonSix.getGender());
 
     assertEquals(6, foundPersonSix.getId());
-
     assertEquals("Nelson", foundPersonSix.getFirstName());
     assertEquals("Mandela", foundPersonSix.getLastName());
     assertEquals("Mvezo - South Africa", foundPersonSix.getAddress());
@@ -251,7 +237,6 @@ public class PersonControllerXmlTest extends AbstractIntegrationTest {
   @Test
   @Order(6)
   public void testFindAllWithoutToken() throws JsonProcessingException {
-
     RequestSpecification specificationWithoutToken = new RequestSpecBuilder()
         .setBasePath("/api/person/v1")
         .setPort(TestConfigs.SERVER_PORT)

@@ -1,20 +1,21 @@
-package com.phyllipesa.erudio.integrationTests.controller.withxml;
+package com.phyllipesa.erudio.integrationTests.controller.withYaml;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 
 import com.phyllipesa.erudio.configs.TestConfigs;
+import com.phyllipesa.erudio.integrationTests.controller.withYaml.mapper.YMLMapper;
 import com.phyllipesa.erudio.integrationTests.testcontainers.AbstractIntegrationTest;
 import com.phyllipesa.erudio.integrationTests.vo.AccountCredentialsVO;
 import com.phyllipesa.erudio.integrationTests.vo.BookVO;
 import com.phyllipesa.erudio.integrationTests.vo.TokenVO;
 
 import io.restassured.builder.RequestSpecBuilder;
+import io.restassured.config.EncoderConfig;
+import io.restassured.config.RestAssuredConfig;
 import io.restassured.filter.log.LogDetail;
 import io.restassured.filter.log.RequestLoggingFilter;
 import io.restassured.filter.log.ResponseLoggingFilter;
+import io.restassured.http.ContentType;
 import io.restassured.specification.RequestSpecification;
 
 import org.junit.jupiter.api.*;
@@ -22,17 +23,19 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
 import static io.restassured.RestAssured.given;
 import static org.junit.jupiter.api.Assertions.*;
 
+
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class BookControllerXmlTest extends AbstractIntegrationTest {
+public class BookControllerYmlTest extends AbstractIntegrationTest {
   private static RequestSpecification specification;
-  private static XmlMapper objectMapper;
+  private static YMLMapper objectMapper;
   private static BookVO book;
   private static Date date;
   private static final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -52,8 +55,7 @@ public class BookControllerXmlTest extends AbstractIntegrationTest {
 
   @BeforeAll
   public static void setup() {
-    objectMapper = new XmlMapper();
-    objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+    objectMapper = new YMLMapper();
     book = new BookVO();
   }
 
@@ -64,17 +66,26 @@ public class BookControllerXmlTest extends AbstractIntegrationTest {
 
     var accessToken =
         given()
+            .config(
+                RestAssuredConfig
+                    .config()
+                    .encoderConfig(EncoderConfig.encoderConfig()
+                        .encodeContentTypeAs(
+                            TestConfigs.CONTENT_TYPE_YML,
+                            ContentType.TEXT
+                        )))
             .basePath("/auth/signin")
             .port(TestConfigs.SERVER_PORT)
-            .contentType(TestConfigs.CONTENT_TYPE_XML)
-            .body(user)
+            .contentType(TestConfigs.CONTENT_TYPE_YML)
+            .accept(TestConfigs.CONTENT_TYPE_YML)
+            .body(user, objectMapper)
             .when()
             .post()
             .then()
             .statusCode(200)
             .extract()
             .body()
-            .as(TokenVO.class)
+            .as(TokenVO.class, objectMapper)
             .getAccessToken();
 
     specification = new RequestSpecBuilder()
@@ -91,21 +102,28 @@ public class BookControllerXmlTest extends AbstractIntegrationTest {
   public void testCreate() throws JsonProcessingException {
     mockBook();
 
-    var content =
+    var persistedBook =
         given()
             .spec(specification)
-            .contentType(TestConfigs.CONTENT_TYPE_XML)
-            .accept(TestConfigs.CONTENT_TYPE_XML)
-            .body(book)
+            .config(
+                RestAssuredConfig
+                    .config()
+                    .encoderConfig(EncoderConfig.encoderConfig()
+                        .encodeContentTypeAs(
+                            TestConfigs.CONTENT_TYPE_YML,
+                            ContentType.TEXT
+                        )))
+            .contentType(TestConfigs.CONTENT_TYPE_YML)
+            .accept(TestConfigs.CONTENT_TYPE_YML)
+            .body(book, objectMapper)
             .when()
             .post()
             .then()
             .statusCode(201)
             .extract()
             .body()
-            .asString();
+            .as(BookVO.class, objectMapper);
 
-    BookVO persistedBook = objectMapper.readValue(content, BookVO.class);
     book = persistedBook;
     assertNotNull(persistedBook.getId());
     assertNotNull(persistedBook.getAuthor());
@@ -125,21 +143,28 @@ public class BookControllerXmlTest extends AbstractIntegrationTest {
   public void testUpdate() throws JsonProcessingException {
     book.setAuthor("Eric Evans");
 
-    var content =
+    var persistedBook =
         given()
             .spec(specification)
-            .contentType(TestConfigs.CONTENT_TYPE_XML)
-            .accept(TestConfigs.CONTENT_TYPE_XML)
-            .body(book)
+            .config(
+                RestAssuredConfig
+                    .config()
+                    .encoderConfig(EncoderConfig.encoderConfig()
+                        .encodeContentTypeAs(
+                            TestConfigs.CONTENT_TYPE_YML,
+                            ContentType.TEXT
+                        )))
+            .contentType(TestConfigs.CONTENT_TYPE_YML)
+            .accept(TestConfigs.CONTENT_TYPE_YML)
+            .body(book, objectMapper)
             .when()
             .put()
             .then()
             .statusCode(200)
             .extract()
             .body()
-            .asString();
+            .as(BookVO.class, objectMapper);
 
-    BookVO persistedBook = objectMapper.readValue(content, BookVO.class);
     book = persistedBook;
     assertNotNull(persistedBook.getId());
     assertNotNull(persistedBook.getAuthor());
@@ -157,10 +182,18 @@ public class BookControllerXmlTest extends AbstractIntegrationTest {
   @Test
   @Order(3)
   public void testFindById() throws JsonProcessingException {
-    var content =
+    var persistedBook =
         given().spec(specification)
-            .contentType(TestConfigs.CONTENT_TYPE_XML)
-            .accept(TestConfigs.CONTENT_TYPE_XML)
+            .config(
+                RestAssuredConfig
+                    .config()
+                    .encoderConfig(EncoderConfig.encoderConfig()
+                        .encodeContentTypeAs(
+                            TestConfigs.CONTENT_TYPE_YML,
+                            ContentType.TEXT
+                        )))
+            .contentType(TestConfigs.CONTENT_TYPE_YML)
+            .accept(TestConfigs.CONTENT_TYPE_YML)
             .pathParam("id", book.getId())
             .when()
             .get("{id}")
@@ -168,9 +201,8 @@ public class BookControllerXmlTest extends AbstractIntegrationTest {
             .statusCode(200)
             .extract()
             .body()
-            .asString();
+            .as(BookVO.class, objectMapper);
 
-    BookVO persistedBook = objectMapper.readValue(content, BookVO.class);
     book = persistedBook;
     assertNotNull(persistedBook.getId());
     assertNotNull(persistedBook.getAuthor());
@@ -189,8 +221,16 @@ public class BookControllerXmlTest extends AbstractIntegrationTest {
   @Order(4)
   public void testDelete() throws JsonProcessingException {
     given().spec(specification)
-        .contentType(TestConfigs.CONTENT_TYPE_XML)
-        .accept(TestConfigs.CONTENT_TYPE_XML)
+        .config(
+            RestAssuredConfig
+                .config()
+                .encoderConfig(EncoderConfig.encoderConfig()
+                    .encodeContentTypeAs(
+                        TestConfigs.CONTENT_TYPE_YML,
+                        ContentType.TEXT
+                    )))
+        .contentType(TestConfigs.CONTENT_TYPE_YML)
+        .accept(TestConfigs.CONTENT_TYPE_YML)
         .pathParam("id", book.getId())
         .when()
         .delete("{id}")
@@ -204,17 +244,25 @@ public class BookControllerXmlTest extends AbstractIntegrationTest {
     var content =
         given()
             .spec(specification)
-            .contentType(TestConfigs.CONTENT_TYPE_XML)
-            .accept(TestConfigs.CONTENT_TYPE_XML)
+            .config(
+                RestAssuredConfig
+                    .config()
+                    .encoderConfig(EncoderConfig.encoderConfig()
+                        .encodeContentTypeAs(
+                            TestConfigs.CONTENT_TYPE_YML,
+                            ContentType.TEXT
+                        )))
+            .contentType(TestConfigs.CONTENT_TYPE_YML)
+            .accept(TestConfigs.CONTENT_TYPE_YML)
             .when()
             .get()
             .then()
             .statusCode(200)
             .extract()
             .body()
-            .asString();
+            .as(BookVO[].class, objectMapper);
 
-    List<BookVO> books = objectMapper.readValue(content, new TypeReference<List<BookVO>>() {});
+    List<BookVO> books = Arrays.asList(content);
     book = books.get(0);
     sdf.applyPattern("yyyy-MM-dd HH:mm:ss.SSS");
     date = sdf.parse("2017-11-29 13:50:05.878");
@@ -244,5 +292,32 @@ public class BookControllerXmlTest extends AbstractIntegrationTest {
     assertEquals("Refactoring", book.getTitle());
     assertEquals(date.toInstant(), book.getlaunchDate().toInstant());
     assertEquals(88.0, book.getPrice());
+  }
+
+  @Test
+  @Order(6)
+  public void testFindAllWithoutToken() throws JsonProcessingException {
+    RequestSpecification specificationWithoutToken = new RequestSpecBuilder()
+        .setBasePath("/api/book/v1")
+        .setPort(TestConfigs.SERVER_PORT)
+        .addFilter(new RequestLoggingFilter(LogDetail.ALL))
+        .addFilter(new ResponseLoggingFilter(LogDetail.ALL))
+        .build();
+
+    given()
+        .spec(specificationWithoutToken)
+        .config(
+            RestAssuredConfig
+                .config()
+                .encoderConfig(EncoderConfig.encoderConfig()
+                    .encodeContentTypeAs(
+                        TestConfigs.CONTENT_TYPE_YML,
+                        ContentType.TEXT
+                    )))
+        .contentType(TestConfigs.CONTENT_TYPE_YML)
+        .when()
+        .get()
+        .then()
+        .statusCode(403);
   }
 }
