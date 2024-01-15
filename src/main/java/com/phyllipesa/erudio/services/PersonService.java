@@ -7,6 +7,7 @@ import com.phyllipesa.erudio.exceptions.ResourceNotFoundException;
 import com.phyllipesa.erudio.mapper.EntityMapper;
 import com.phyllipesa.erudio.models.Person;
 import com.phyllipesa.erudio.repositories.PersonRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -67,6 +68,18 @@ public class PersonService {
     PersonVO vo = entityMapper.parseObject(personRepository.save(entity), PersonVO.class);
     vo.add(linkTo(methodOn(PersonController.class).findById(vo.getKey())).withSelfRel());
     return  vo;
+  }
+
+  @Transactional
+  public PersonVO disablePerson(Long id) {
+    logger.info("Disabling a person!");
+    personRepository.disablePerson(id);
+
+    Person p = personRepository.findById(id)
+        .orElseThrow(() -> new ResourceNotFoundException("No record found for this ID!"));
+    PersonVO person = entityMapper.parseObject(p, PersonVO.class);
+    person.add(linkTo(methodOn(PersonController.class).findById(id)).withSelfRel());
+    return person;
   }
 
   public void delete(Long id) {
