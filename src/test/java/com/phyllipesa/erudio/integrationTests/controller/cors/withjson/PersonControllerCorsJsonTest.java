@@ -93,8 +93,10 @@ public class PersonControllerCorsJsonTest extends AbstractIntegrationTest {
     assertNotNull(persistedPerson.getLastName());
     assertNotNull(persistedPerson.getAddress());
     assertNotNull(persistedPerson.getGender());
+    assertNotNull(persistedPerson.getEnabled());
 
 		assertTrue(persistedPerson.getId() > 0);
+    assertTrue(persistedPerson.getEnabled());
 
     assertEquals("Richard", persistedPerson.getFirstName());
     assertEquals("Stallman", persistedPerson.getLastName());
@@ -130,6 +132,7 @@ public class PersonControllerCorsJsonTest extends AbstractIntegrationTest {
 		person.setLastName("Stallman");
 		person.setAddress("New York City, New York, US");
 		person.setGender("Male");
+		person.setEnabled(true);
 	}
 
   @Test
@@ -153,15 +156,15 @@ public class PersonControllerCorsJsonTest extends AbstractIntegrationTest {
     PersonVO persistedPerson = objectMapper.readValue(content, PersonVO.class);
     person = persistedPerson;
 
-    assertNotNull(persistedPerson);
-
     assertNotNull(persistedPerson.getId());
     assertNotNull(persistedPerson.getFirstName());
     assertNotNull(persistedPerson.getLastName());
     assertNotNull(persistedPerson.getAddress());
     assertNotNull(persistedPerson.getGender());
+    assertNotNull(persistedPerson.getEnabled());
 
     assertTrue(persistedPerson.getId() > 0);
+    assertTrue(persistedPerson.getEnabled());
 
     assertEquals("Richard", persistedPerson.getFirstName());
     assertEquals("Stallman", persistedPerson.getLastName());
