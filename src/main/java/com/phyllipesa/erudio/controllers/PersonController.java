@@ -136,6 +136,33 @@ public class PersonController {
     return ResponseEntity.status(200).body(service.update(person));
   }
 
+  @PatchMapping(
+      value = "/{id}",
+      produces = {
+          MediaType.APPLICATION_JSON,
+          MediaType.APPLICATION_XML,
+          MediaType.APPLICATION_YML
+      }
+  )
+  @Operation(
+      summary = "Disable a specific person by your ID",
+      description = "Disable a specific person by your ID",
+      tags = {"People"},
+      responses = {
+          @ApiResponse(description = "Success", responseCode = "200",
+              content = @Content(schema = @Schema(implementation = PersonVO.class))
+          ),
+          @ApiResponse(description = "No Content", responseCode = "204", content = @Content),
+          @ApiResponse(description = "Bad Request", responseCode = "400", content = @Content),
+          @ApiResponse(description = "Unauthorized", responseCode = "401", content = @Content),
+          @ApiResponse(description = "Not Found", responseCode = "404", content = @Content),
+          @ApiResponse(description = "Internal Error", responseCode = "500", content = @Content)
+      }
+  )
+  public ResponseEntity<PersonVO> disablePerson(@PathVariable(value = "id") Long id) {
+    return ResponseEntity.ok(service.disablePerson(id));
+  }
+
   @DeleteMapping("/{id}")
   @Operation(
     summary = "Deletes a person",
