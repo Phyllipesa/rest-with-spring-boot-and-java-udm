@@ -216,7 +216,7 @@ public class PersonControllerYmlTest extends AbstractIntegrationTest {
   }
 
   @Test
-  @Order(3)
+  @Order(4)
   public void testFindById() throws JsonProcessingException {
     var persistedPerson =
         given().spec(specification)
@@ -257,7 +257,7 @@ public class PersonControllerYmlTest extends AbstractIntegrationTest {
   }
 
   @Test
-  @Order(4)
+  @Order(5)
   public void testDelete() throws JsonProcessingException {
     given().spec(specification)
         .config(
@@ -278,7 +278,7 @@ public class PersonControllerYmlTest extends AbstractIntegrationTest {
   }
 
   @Test
-  @Order(5)
+  @Order(6)
   public void testFindAll() throws JsonProcessingException {
     var content =
         given()
@@ -337,7 +337,7 @@ public class PersonControllerYmlTest extends AbstractIntegrationTest {
   }
 
   @Test
-  @Order(6)
+  @Order(7)
   public void testFindAllWithoutToken() throws JsonProcessingException {
     RequestSpecification specificationWithoutToken = new RequestSpecBuilder()
         .setBasePath("/api/person/v1")
