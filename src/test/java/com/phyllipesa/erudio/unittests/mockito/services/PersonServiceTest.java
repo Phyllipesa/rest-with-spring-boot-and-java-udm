@@ -65,6 +65,7 @@ class PersonServiceTest {
         assertEquals("Last Name Test1", personOne.getLastName());
         assertEquals("address Test1", personOne.getAddress());
         assertEquals("Female", personOne.getGender());
+        assertTrue(personOne.getEnabled());
 
         var personFour = people.get(4);
         assertNotNull(personFour.getKey());
@@ -74,6 +75,8 @@ class PersonServiceTest {
         assertEquals("Last Name Test4", personFour.getLastName());
         assertEquals("address Test4", personFour.getAddress());
         assertEquals("Male", personFour.getGender());
+        assertTrue(personFour.getEnabled());
+
 
         var personSeven = people.get(7);
         assertNotNull(personSeven.getKey());
@@ -83,6 +86,8 @@ class PersonServiceTest {
         assertEquals("Last Name Test7", personSeven.getLastName());
         assertEquals("address Test7", personSeven.getAddress());
         assertEquals("Female", personSeven.getGender());
+        assertTrue(personSeven.getEnabled());
+
     }
 
     @Test
@@ -102,6 +107,7 @@ class PersonServiceTest {
         assertEquals("Last Name Test0", result.getLastName());
         assertEquals("address Test0", result.getAddress());
         assertEquals("Male", result.getGender());
+        assertTrue(result.getEnabled());
     }
 
     @Test
@@ -127,6 +133,7 @@ class PersonServiceTest {
         assertEquals("Last Name Test1", result.getLastName());
         assertEquals("address Test1", result.getAddress());
         assertEquals("Female", result.getGender());
+        assertTrue(result.getEnabled());
     }
 
     @Test
@@ -167,6 +174,7 @@ class PersonServiceTest {
         assertEquals("Last Name Test1", result.getLastName());
         assertEquals("address Test1", result.getAddress());
         assertEquals("Female", result.getGender());
+        assertTrue(result.getEnabled());
     }
 
     @Test

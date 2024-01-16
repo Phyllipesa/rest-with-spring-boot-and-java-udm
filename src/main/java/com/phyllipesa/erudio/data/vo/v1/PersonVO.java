@@ -2,13 +2,14 @@ package com.phyllipesa.erudio.data.vo.v1;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import jakarta.persistence.Column;
 import org.springframework.hateoas.RepresentationModel;
 
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.Objects;
 
-@JsonPropertyOrder({ "id", "firstName", "lastName", "address", "gender" })
+@JsonPropertyOrder({ "id", "firstName", "lastName", "address", "gender", "enabled" })
 public class PersonVO extends RepresentationModel<PersonVO> implements Serializable {
 
   @Serial
@@ -20,6 +21,7 @@ public class PersonVO extends RepresentationModel<PersonVO> implements Serializa
   private String lastName;
   private String address;
   private String gender;
+  private Boolean enabled;
 
   public PersonVO() {
   }
@@ -64,16 +66,24 @@ public class PersonVO extends RepresentationModel<PersonVO> implements Serializa
     this.gender = gender;
   }
 
+  public Boolean getEnabled() {
+    return enabled;
+  }
+
+  public void setEnabled(Boolean enabled) {
+    this.enabled = enabled;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
     if (!(o instanceof PersonVO personVO)) return false;
     if (!super.equals(o)) return false;
-    return Objects.equals(key, personVO.key) && Objects.equals(firstName, personVO.firstName) && Objects.equals(lastName, personVO.lastName) && Objects.equals(address, personVO.address) && Objects.equals(gender, personVO.gender);
+    return Objects.equals(key, personVO.key) && Objects.equals(firstName, personVO.firstName) && Objects.equals(lastName, personVO.lastName) && Objects.equals(address, personVO.address) && Objects.equals(gender, personVO.gender) && Objects.equals(enabled, personVO.enabled);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(super.hashCode(), key, firstName, lastName, address, gender);
+    return Objects.hash(super.hashCode(), key, firstName, lastName, address, gender, enabled);
   }
 }
