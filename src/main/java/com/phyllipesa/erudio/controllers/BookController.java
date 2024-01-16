@@ -9,6 +9,12 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.*;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -47,8 +53,14 @@ public class BookController {
           @ApiResponse(description = "Internal Error", responseCode = "500", content = @Content)
       }
   )
-  public ResponseEntity<List<BookVO>> findAll() {
-    return ResponseEntity.ok(service.findAll());
+  public ResponseEntity<PagedModel<EntityModel<BookVO>>> findAll(
+      @RequestParam(value = "page", defaultValue = "0") Integer page,
+      @RequestParam(value = "size", defaultValue = "5") Integer size,
+      @RequestParam(value = "direction", defaultValue = "5") String direction
+  ) {
+    var sortDirection = "desc".equalsIgnoreCase(direction) ? Direction.DESC : Direction.ASC;
+    Pageable pageable = PageRequest.of(page, size, Sort.by(sortDirection, "author"));
+    return ResponseEntity.ok(service.findAll(pageable));
   }
 
   @GetMapping(

@@ -2,12 +2,18 @@ package com.phyllipesa.erudio.services;
 
 import com.phyllipesa.erudio.controllers.BookController;
 import com.phyllipesa.erudio.data.vo.v1.BookVO;
+import com.phyllipesa.erudio.data.vo.v1.PersonVO;
 import com.phyllipesa.erudio.exceptions.RequiredObjectIsNullException;
 import com.phyllipesa.erudio.exceptions.ResourceNotFoundException;
 import com.phyllipesa.erudio.mapper.EntityMapper;
 import com.phyllipesa.erudio.models.Book;
 import com.phyllipesa.erudio.repositories.BookRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.Link;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -25,13 +31,30 @@ public class BookService {
   BookRepository bookRepository;
 
   @Autowired
+  PagedResourcesAssembler<BookVO> assembler;
+
+  @Autowired
   EntityMapper entityMapper;
 
-  public List<BookVO> findAll() {
+  public PagedModel<EntityModel<BookVO>> findAll(Pageable pageable) {
     logger.info("Finding all books!");
-    List<BookVO> list = entityMapper.parseListObject(bookRepository.findAll(), BookVO.class);
-    list.forEach(p -> p.add(linkTo(methodOn(BookController.class).findById(p.getKey())).withSelfRel()));
-    return list;
+
+    var bookPage = bookRepository.findAll(pageable);
+    var bookVosPage = bookPage.map( b -> entityMapper.parseObject(b, BookVO.class));
+    bookVosPage.map(
+        b -> b.add(
+            linkTo(methodOn(BookController.class)
+                .findById(b.getKey())).withSelfRel()));
+
+    Link link = linkTo(
+        methodOn(BookController.class)
+            .findAll(
+                pageable.getPageNumber(),
+                pageable.getPageSize(),
+                "asc"
+            )).withSelfRel();
+
+    return assembler.toModel(bookVosPage, link);
   }
 
   public BookVO findById(Long id) {
