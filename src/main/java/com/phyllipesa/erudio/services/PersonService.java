@@ -9,8 +9,11 @@ import com.phyllipesa.erudio.models.Person;
 import com.phyllipesa.erudio.repositories.PersonRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.Link;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.stereotype.Service;
 
 import java.util.logging.Logger;
@@ -27,9 +30,12 @@ public class PersonService {
   PersonRepository personRepository;
 
   @Autowired
+  PagedResourcesAssembler<PersonVO> assembler;
+
+  @Autowired
   EntityMapper entityMapper;
 
-  public Page<PersonVO> findAll(Pageable pageable) {
+  public PagedModel<EntityModel<PersonVO>> findAll(Pageable pageable) {
     logger.info("Finding all people!");
 
     var personPage = personRepository.findAll(pageable);
@@ -39,7 +45,15 @@ public class PersonService {
             linkTo(methodOn(PersonController.class)
                 .findById(p.getKey())).withSelfRel()));
 
-    return personVosPage;
+    Link link = linkTo(
+        methodOn(PersonController.class)
+            .findAll(
+                pageable.getPageNumber(),
+                pageable.getPageSize(),
+                "asc"
+                )).withSelfRel();
+
+    return assembler.toModel(personVosPage, link);
   }
 
   public PersonVO findById(Long id) {
