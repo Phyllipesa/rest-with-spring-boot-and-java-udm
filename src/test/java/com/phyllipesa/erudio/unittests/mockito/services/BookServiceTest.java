@@ -16,7 +16,6 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -41,47 +40,6 @@ class BookServiceTest {
     void setUpMocks() {
         input = new MockBook();
         MockitoAnnotations.openMocks(this);
-    }
-
-    @Test
-    void findAll() {
-        List<Book> list = input.mockEntityList();
-        List<BookVO> voList = input.mockVOList();
-
-        when(repository.findAll()).thenReturn(list);
-        when(entityMapper.parseListObject(list, BookVO.class)).thenReturn(voList);
-
-        var books = service.findAll();
-
-        assertNotNull(books);
-        assertEquals(14, books.size());
-
-        var bookOne = books.get(1);
-        assertNotNull(bookOne.getKey());
-        assertNotNull(bookOne.getLinks());
-        assertTrue(bookOne.toString().contains("links: [</api/book/v1/1>;rel=\"self\"]"));
-        assertEquals("some author Test1", bookOne.getAuthor());
-        assertNotNull(bookOne.getlaunchDate());
-        assertEquals(25D, bookOne.getPrice());
-        assertEquals("some title Test1", bookOne.getTitle());
-
-        var bookFour = books.get(4);
-        assertNotNull(bookFour.getKey());
-        assertNotNull(bookFour.getLinks());
-        assertTrue(bookFour.toString().contains("links: [</api/book/v1/4>;rel=\"self\"]"));
-        assertEquals("some author Test4", bookFour.getAuthor());
-        assertNotNull(bookFour.getlaunchDate());
-        assertEquals(25D, bookFour.getPrice());
-        assertEquals("some title Test4", bookFour.getTitle());
-
-        var bookSeven = books.get(7);
-        assertNotNull(bookSeven.getKey());
-        assertNotNull(bookSeven.getLinks());
-        assertTrue(bookSeven.toString().contains("links: [</api/book/v1/7>;rel=\"self\"]"));
-        assertEquals("some author Test7", bookSeven.getAuthor());
-        assertNotNull(bookSeven.getlaunchDate());
-        assertEquals(25D, bookSeven.getPrice());
-        assertEquals("some title Test7", bookSeven.getTitle());
     }
 
     @Test

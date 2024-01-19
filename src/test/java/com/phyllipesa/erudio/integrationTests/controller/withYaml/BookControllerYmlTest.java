@@ -1,14 +1,13 @@
 package com.phyllipesa.erudio.integrationTests.controller.withYaml;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-
 import com.phyllipesa.erudio.configs.TestConfigs;
 import com.phyllipesa.erudio.integrationTests.controller.withYaml.mapper.YMLMapper;
 import com.phyllipesa.erudio.integrationTests.testcontainers.AbstractIntegrationTest;
 import com.phyllipesa.erudio.integrationTests.vo.AccountCredentialsVO;
 import com.phyllipesa.erudio.integrationTests.vo.BookVO;
 import com.phyllipesa.erudio.integrationTests.vo.TokenVO;
-
+import com.phyllipesa.erudio.integrationTests.vo.pagedmodels.PagedModelBook;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.config.EncoderConfig;
 import io.restassured.config.RestAssuredConfig;
@@ -17,15 +16,12 @@ import io.restassured.filter.log.RequestLoggingFilter;
 import io.restassured.filter.log.ResponseLoggingFilter;
 import io.restassured.http.ContentType;
 import io.restassured.specification.RequestSpecification;
-
 import org.junit.jupiter.api.*;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
 import java.util.Date;
-import java.util.List;
 
 import static io.restassured.RestAssured.given;
 import static org.junit.jupiter.api.Assertions.*;
@@ -241,7 +237,65 @@ public class BookControllerYmlTest extends AbstractIntegrationTest {
   @Test
   @Order(5)
   public void testFindAll() throws JsonProcessingException, ParseException {
-    var content =
+    var wrapper =
+        given()
+            .spec(specification)
+            .config(
+                RestAssuredConfig
+                    .config()
+                    .encoderConfig(EncoderConfig.encoderConfig()
+                        .encodeContentTypeAs(
+                            TestConfigs.CONTENT_TYPE_YML,
+                            ContentType.TEXT
+                        )))
+            .contentType(TestConfigs.CONTENT_TYPE_YML)
+            .queryParams("page", 3, "size", 3, "direction", "asc")
+            .accept(TestConfigs.CONTENT_TYPE_YML)
+            .when()
+            .get()
+            .then()
+            .statusCode(200)
+            .extract()
+            .body()
+            .as(PagedModelBook.class, objectMapper);
+
+    var books = wrapper.getContent();
+
+    book = books.get(0);
+    sdf.applyPattern("yyyy-MM-dd HH:mm:ss.SSS");
+    date = sdf.parse("2017-11-07 15:09:01.674");
+    assertNotNull(book.getId());
+    assertNotNull(book.getAuthor());
+    assertNotNull(book.getTitle());
+    assertNotNull(book.getlaunchDate());
+    assertNotNull(book.getPrice());
+
+    assertEquals(13, book.getId());
+    assertEquals("Richard Hunter e George Westerman", book.getAuthor());
+    assertEquals("O verdadeiro valor de TI", book.getTitle());
+    assertEquals(date.toInstant(), book.getlaunchDate().toInstant());
+    assertEquals(95.0, book.getPrice());
+
+
+    book = books.get(2);
+    date = sdf.parse("2017-11-07 15:09:01.674");
+    assertNotNull(book.getId());
+    assertNotNull(book.getAuthor());
+    assertNotNull(book.getTitle());
+    assertNotNull(book.getlaunchDate());
+    assertNotNull(book.getPrice());
+
+    assertEquals(11, book.getId());
+    assertEquals("Roger S. Pressman", book.getAuthor());
+    assertEquals("Engenharia de Software: uma abordagem profissional", book.getTitle());
+    assertEquals(date.toInstant(), book.getlaunchDate().toInstant());
+    assertEquals(56.0, book.getPrice());
+  }
+
+  @Test
+  @Order(8)
+  public void testHATEAOS() throws JsonProcessingException {
+    var wrapper =
         given()
             .spec(specification)
             .config(
@@ -254,48 +308,51 @@ public class BookControllerYmlTest extends AbstractIntegrationTest {
                         )))
             .contentType(TestConfigs.CONTENT_TYPE_YML)
             .accept(TestConfigs.CONTENT_TYPE_YML)
+            .queryParams("page", 0, "size", 3, "direction", "asc")
             .when()
             .get()
             .then()
             .statusCode(200)
             .extract()
             .body()
-            .as(BookVO[].class, objectMapper);
+            .asString();
 
-    List<BookVO> books = Arrays.asList(content);
-    book = books.get(0);
-    sdf.applyPattern("yyyy-MM-dd HH:mm:ss.SSS");
-    date = sdf.parse("2017-11-29 13:50:05.878");
-    assertNotNull(book.getId());
-    assertNotNull(book.getAuthor());
-    assertNotNull(book.getTitle());
-    assertNotNull(book.getlaunchDate());
-    assertNotNull(book.getPrice());
+    assertTrue(wrapper.contains(
+        "rel: \"self\"\n" +
+            "    href: \"http://localhost:8888/api/book/v1/15\""));
+    assertTrue(wrapper.contains(
+        "rel: \"self\"\n" +
+            "    href: \"http://localhost:8888/api/book/v1/9\""));
+    assertTrue(wrapper.contains(
+        "rel: \"self\"\n" +
+            "    href: \"http://localhost:8888/api/book/v1/4\""));
 
-    assertEquals(1, book.getId());
-    assertEquals("Michael C. Feathers", book.getAuthor());
-    assertEquals("Working effectively with legacy code", book.getTitle());
-    assertEquals(date.toInstant(), book.getlaunchDate().toInstant());
-    assertEquals(49.0, book.getPrice());
+    assertTrue(wrapper.contains(
+        "rel: \"first\"\n" +
+            "  href: \"http://localhost:8888/api/book/v1?direction=asc&page=0&size=3&sort=author,asc\""));
 
+    assertTrue(wrapper.contains(
+        "rel: \"self\"\n" +
+            "  href: \"http://localhost:8888/api/book/v1?page=0&size=3&direction=asc\""));
 
-    book = books.get(5);
-    date = sdf.parse("2017-11-07 15:09:01.674");
-    assertNotNull(book.getId());
-    assertNotNull(book.getAuthor());
-    assertNotNull(book.getTitle());
-    assertNotNull(book.getlaunchDate());
-    assertNotNull(book.getPrice());
+    assertTrue(wrapper.contains(
+        "rel: \"next\"\n" +
+            "  href: \"http://localhost:8888/api/book/v1?direction=asc&page=1&size=3&sort=author,asc\""));
 
-    assertEquals(6, book.getId());
-    assertEquals("Martin Fowler e Kent Beck", book.getAuthor());
-    assertEquals("Refactoring", book.getTitle());
-    assertEquals(date.toInstant(), book.getlaunchDate().toInstant());
-    assertEquals(88.0, book.getPrice());
+    assertTrue(wrapper.contains(
+        "rel: \"last\"\n" +
+            "  href: \"http://localhost:8888/api/book/v1?direction=asc&page=4&size=3&sort=author,asc\""));
+
+    assertTrue(wrapper.contains(
+        "page:\n" +
+            "  size: 3\n" +
+            "  totalElements: 15\n" +
+            "  totalPages: 5\n" +
+            "  number: 0"));
   }
 
   @Test
-  @Order(6)
+  @Order(8)
   public void testFindAllWithoutToken() throws JsonProcessingException {
     RequestSpecification specificationWithoutToken = new RequestSpecBuilder()
         .setBasePath("/api/book/v1")
