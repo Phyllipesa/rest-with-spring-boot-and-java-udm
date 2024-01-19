@@ -127,14 +127,6 @@ public class PersonControllerCorsJsonTest extends AbstractIntegrationTest {
     assertEquals("Invalid CORS request", content);
   }
 
-	private void mockPerson() {
-		person.setFirstName("Richard");
-		person.setLastName("Stallman");
-		person.setAddress("New York City, New York, US");
-		person.setGender("Male");
-		person.setEnabled(true);
-	}
-
   @Test
   @Order(3)
   public void testFindById() throws JsonProcessingException {
@@ -193,5 +185,25 @@ public class PersonControllerCorsJsonTest extends AbstractIntegrationTest {
 
     assertNotNull(content);
     assertEquals("Invalid CORS request", content);
+  }
+
+  @Test
+  @Order(5)
+  public void testDelete() throws JsonProcessingException {
+    given().spec(specification)
+      .contentType(TestConfigs.CONTENT_TYPE_JSON)
+      .pathParam("id", person.getId())
+    .when()
+      .delete("{id}")
+      .then()
+      .statusCode(204);
+  }
+
+  private void mockPerson() {
+    person.setFirstName("Richard");
+    person.setLastName("Stallman");
+    person.setAddress("New York City, New York, US");
+    person.setGender("Male");
+    person.setEnabled(true);
   }
 }
