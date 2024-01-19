@@ -9,7 +9,6 @@ import com.phyllipesa.erudio.integrationTests.vo.AccountCredentialsVO;
 import com.phyllipesa.erudio.integrationTests.vo.PersonVO;
 import com.phyllipesa.erudio.integrationTests.vo.TokenVO;
 import com.phyllipesa.erudio.integrationTests.vo.pagedmodels.PagedModelPerson;
-import com.phyllipesa.erudio.integrationTests.vo.wrappers.WrapperPersonVO;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.filter.log.LogDetail;
 import io.restassured.filter.log.RequestLoggingFilter;
@@ -285,6 +284,74 @@ public class PersonControllerXmlTest extends AbstractIntegrationTest {
 
   @Test
   @Order(7)
+  public void testFindByName() throws JsonProcessingException {
+    var content =
+        given()
+            .spec(specification)
+            .contentType(TestConfigs.CONTENT_TYPE_XML)
+            .accept(TestConfigs.CONTENT_TYPE_XML)
+            .pathParam("firstName", "ayr")
+            .queryParams("page", 0, "size", 6, "direction", "asc")
+            .when()
+            .get("findPersonsByName/{firstName}")
+            .then()
+            .statusCode(200)
+            .extract()
+            .body()
+            .asString();
+
+    PagedModelPerson wrapper = objectMapper.readValue(content, PagedModelPerson.class);
+    var people = wrapper.getContent();
+
+    PersonVO foundPersonOne = people.get(0);
+    assertNotNull(foundPersonOne.getId());
+    assertNotNull(foundPersonOne.getFirstName());
+    assertNotNull(foundPersonOne.getLastName());
+    assertNotNull(foundPersonOne.getAddress());
+    assertNotNull(foundPersonOne.getGender());
+    assertNotNull(foundPersonOne.getEnabled());
+
+    assertTrue(foundPersonOne.getEnabled());
+
+    assertEquals(1, foundPersonOne.getId());
+    assertEquals("Ayrton", foundPersonOne.getFirstName());
+    assertEquals("Senna", foundPersonOne.getLastName());
+    assertEquals("São Paulo", foundPersonOne.getAddress());
+    assertEquals("Male", foundPersonOne.getGender());
+  }
+
+  @Test
+  @Order(8)
+  public void testHATEAOS() throws JsonProcessingException {
+    var content =
+        given()
+            .spec(specification)
+            .contentType(TestConfigs.CONTENT_TYPE_XML)
+            .accept(TestConfigs.CONTENT_TYPE_XML)
+            .queryParams("page", 0, "size", 10, "direction", "asc")
+            .when()
+            .get()
+            .then()
+            .statusCode(200)
+            .extract()
+            .body()
+            .asString();
+
+    assertTrue(content.contains("<links><rel>self</rel><href>http://localhost:8888/api/person/v1/700</href></links>"));
+    assertTrue(content.contains("<links><rel>self</rel><href>http://localhost:8888/api/person/v1/379</href></links>"));
+    assertTrue(content.contains("<links><rel>self</rel><href>http://localhost:8888/api/person/v1/159</href></links>"));
+    assertTrue(content.contains("<links><rel>self</rel><href>http://localhost:8888/api/person/v1/997</href></links>"));
+
+    assertTrue(content.contains("<links><rel>first</rel><href>http://localhost:8888/api/person/v1?direction=asc&amp;page=0&amp;size=10&amp;sort=firstName,asc</href></links>"));
+    assertTrue(content.contains("<links><rel>self</rel><href>http://localhost:8888/api/person/v1?page=0&amp;size=10&amp;direction=asc</href></links>"));
+    assertTrue(content.contains("<links><rel>next</rel><href>http://localhost:8888/api/person/v1?direction=asc&amp;page=1&amp;size=10&amp;sort=firstName,asc</href></links>"));
+    assertTrue(content.contains("<links><rel>last</rel><href>http://localhost:8888/api/person/v1?direction=asc&amp;page=100&amp;size=10&amp;sort=firstName,asc</href></links>"));
+
+    assertTrue(content.contains("<page><size>10</size><totalElements>1009</totalElements><totalPages>101</totalPages><number>0</number></page>"));
+  }
+
+  @Test
+  @Order(9)
   public void testFindAllWithoutToken() throws JsonProcessingException {
     RequestSpecification specificationWithoutToken = new RequestSpecBuilder()
         .setBasePath("/api/person/v1")
@@ -296,6 +363,7 @@ public class PersonControllerXmlTest extends AbstractIntegrationTest {
     given()
         .spec(specificationWithoutToken)
         .contentType(TestConfigs.CONTENT_TYPE_XML)
+        .accept(TestConfigs.CONTENT_TYPE_XML)
         .when()
         .get()
         .then()

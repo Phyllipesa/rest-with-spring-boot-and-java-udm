@@ -231,6 +231,7 @@ public class PersonControllerJsonTest extends AbstractIntegrationTest {
       given()
           .spec(specification)
           .contentType(TestConfigs.CONTENT_TYPE_JSON)
+          .accept(TestConfigs.CONTENT_TYPE_JSON)
           .queryParams("page", 3, "size", 10, "direction", "asc")
         .when()
           .get()
@@ -279,6 +280,74 @@ public class PersonControllerJsonTest extends AbstractIntegrationTest {
 
   @Test
   @Order(7)
+  public void testFindByName() throws JsonProcessingException {
+    var content =
+        given()
+            .spec(specification)
+            .contentType(TestConfigs.CONTENT_TYPE_JSON)
+            .accept(TestConfigs.CONTENT_TYPE_JSON)
+            .pathParam("firstName", "ayr")
+            .queryParams("page", 0, "size", 6, "direction", "asc")
+            .when()
+            .get("findPersonsByName/{firstName}")
+            .then()
+            .statusCode(200)
+            .extract()
+            .body()
+            .asString();
+
+    WrapperPersonVO wrapper = objectMapper.readValue(content, WrapperPersonVO.class);
+    var people = wrapper.getEmbedded().getPersons();
+
+    PersonVO foundPersonOne = people.get(0);
+    assertNotNull(foundPersonOne.getId());
+    assertNotNull(foundPersonOne.getFirstName());
+    assertNotNull(foundPersonOne.getLastName());
+    assertNotNull(foundPersonOne.getAddress());
+    assertNotNull(foundPersonOne.getGender());
+    assertNotNull(foundPersonOne.getEnabled());
+
+    assertTrue(foundPersonOne.getEnabled());
+
+    assertEquals(1, foundPersonOne.getId());
+    assertEquals("Ayrton", foundPersonOne.getFirstName());
+    assertEquals("Senna", foundPersonOne.getLastName());
+    assertEquals("São Paulo", foundPersonOne.getAddress());
+    assertEquals("Male", foundPersonOne.getGender());
+  }
+
+  @Test
+  @Order(8)
+  public void testHATEAOS() throws JsonProcessingException {
+    var content =
+        given()
+            .spec(specification)
+            .contentType(TestConfigs.CONTENT_TYPE_JSON)
+            .accept(TestConfigs.CONTENT_TYPE_JSON)
+            .queryParams("page", 0, "size", 10, "direction", "asc")
+            .when()
+            .get()
+            .then()
+            .statusCode(200)
+            .extract()
+            .body()
+            .asString();
+
+    assertTrue(content.contains("\"_links\":{\"self\":{\"href\":\"http://localhost:8888/api/person/v1/700\"}}}"));
+    assertTrue(content.contains("\"_links\":{\"self\":{\"href\":\"http://localhost:8888/api/person/v1/379\"}}}"));
+    assertTrue(content.contains("\"_links\":{\"self\":{\"href\":\"http://localhost:8888/api/person/v1/159\"}}}"));
+    assertTrue(content.contains("\"_links\":{\"self\":{\"href\":\"http://localhost:8888/api/person/v1/997\"}}}"));
+
+    assertTrue(content.contains("\"first\":{\"href\":\"http://localhost:8888/api/person/v1?direction=asc&page=0&size=10&sort=firstName,asc\"}"));
+    assertTrue(content.contains("\"self\":{\"href\":\"http://localhost:8888/api/person/v1?page=0&size=10&direction=asc\"}"));
+    assertTrue(content.contains("\"next\":{\"href\":\"http://localhost:8888/api/person/v1?direction=asc&page=1&size=10&sort=firstName,asc\"}"));
+    assertTrue(content.contains("\"last\":{\"href\":\"http://localhost:8888/api/person/v1?direction=asc&page=100&size=10&sort=firstName,asc\"}}"));
+
+    assertTrue(content.contains("\"page\":{\"size\":10,\"totalElements\":1009,\"totalPages\":101,\"number\":0}}"));
+  }
+
+  @Test
+  @Order(9)
   public void testFindAllWithoutToken() throws JsonProcessingException {
     RequestSpecification specificationWithoutToken = new RequestSpecBuilder()
       .setBasePath("/api/person/v1")

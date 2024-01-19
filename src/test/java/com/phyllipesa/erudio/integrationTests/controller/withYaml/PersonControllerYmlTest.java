@@ -8,7 +8,6 @@ import com.phyllipesa.erudio.integrationTests.vo.AccountCredentialsVO;
 import com.phyllipesa.erudio.integrationTests.vo.PersonVO;
 import com.phyllipesa.erudio.integrationTests.vo.TokenVO;
 import com.phyllipesa.erudio.integrationTests.vo.pagedmodels.PagedModelPerson;
-import com.phyllipesa.erudio.integrationTests.vo.wrappers.WrapperPersonVO;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.config.EncoderConfig;
 import io.restassured.config.RestAssuredConfig;
@@ -336,6 +335,113 @@ public class PersonControllerYmlTest extends AbstractIntegrationTest {
 
   @Test
   @Order(7)
+  public void testFindByName() throws JsonProcessingException {
+    var wrapper =
+        given()
+            .spec(specification)
+            .config(
+                RestAssuredConfig
+                    .config()
+                    .encoderConfig(EncoderConfig.encoderConfig()
+                        .encodeContentTypeAs(
+                            TestConfigs.CONTENT_TYPE_YML,
+                            ContentType.TEXT
+                        )))
+            .contentType(TestConfigs.CONTENT_TYPE_YML)
+            .accept(TestConfigs.CONTENT_TYPE_YML)
+            .pathParam("firstName", "ayr")
+            .queryParams("page", 0, "size", 6, "direction", "asc")
+            .when()
+            .get("findPersonsByName/{firstName}")
+            .then()
+            .statusCode(200)
+            .extract()
+            .body()
+            .as(PagedModelPerson.class, objectMapper);
+
+    var people = wrapper.getContent();
+
+    PersonVO foundPersonOne = people.get(0);
+    assertNotNull(foundPersonOne.getId());
+    assertNotNull(foundPersonOne.getFirstName());
+    assertNotNull(foundPersonOne.getLastName());
+    assertNotNull(foundPersonOne.getAddress());
+    assertNotNull(foundPersonOne.getGender());
+    assertNotNull(foundPersonOne.getEnabled());
+
+    assertTrue(foundPersonOne.getEnabled());
+
+    assertEquals(1, foundPersonOne.getId());
+    assertEquals("Ayrton", foundPersonOne.getFirstName());
+    assertEquals("Senna", foundPersonOne.getLastName());
+    assertEquals("São Paulo", foundPersonOne.getAddress());
+    assertEquals("Male", foundPersonOne.getGender());
+  }
+
+  @Test
+  @Order(8)
+  public void testHATEAOS() throws JsonProcessingException {
+    var wrapper =
+        given()
+            .spec(specification)
+            .config(
+                RestAssuredConfig
+                    .config()
+                    .encoderConfig(EncoderConfig.encoderConfig()
+                        .encodeContentTypeAs(
+                            TestConfigs.CONTENT_TYPE_YML,
+                            ContentType.TEXT
+                        )))
+            .contentType(TestConfigs.CONTENT_TYPE_YML)
+            .accept(TestConfigs.CONTENT_TYPE_YML)
+            .queryParams("page", 0, "size", 10, "direction", "asc")
+            .when()
+            .get()
+            .then()
+            .statusCode(200)
+            .extract()
+            .body()
+            .asString();
+
+    assertTrue(wrapper.contains(
+        "rel: \"self\"\n" +
+        "    href: \"http://localhost:8888/api/person/v1/700\""));
+    assertTrue(wrapper.contains(
+        "rel: \"self\"\n" +
+            "    href: \"http://localhost:8888/api/person/v1/379\""));
+    assertTrue(wrapper.contains(
+        "rel: \"self\"\n" +
+            "    href: \"http://localhost:8888/api/person/v1/159\""));
+    assertTrue(wrapper.contains(
+        "rel: \"self\"\n" +
+            "    href: \"http://localhost:8888/api/person/v1/997\""));
+
+    assertTrue(wrapper.contains(
+        "rel: \"first\"\n" +
+        "  href: \"http://localhost:8888/api/person/v1?direction=asc&page=0&size=10&sort=firstName,asc\""));
+
+    assertTrue(wrapper.contains(
+        "rel: \"self\"\n" +
+        "  href: \"http://localhost:8888/api/person/v1?page=0&size=10&direction=asc\""));
+
+    assertTrue(wrapper.contains(
+        "rel: \"next\"\n" +
+        "  href: \"http://localhost:8888/api/person/v1?direction=asc&page=1&size=10&sort=firstName,asc\""));
+
+    assertTrue(wrapper.contains(
+        "rel: \"last\"\n" +
+        "  href: \"http://localhost:8888/api/person/v1?direction=asc&page=100&size=10&sort=firstName,asc\""));
+
+    assertTrue(wrapper.contains(
+        "page:\n" +
+        "  size: 10\n" +
+        "  totalElements: 1009\n" +
+        "  totalPages: 101\n" +
+        "  number: 0"));
+  }
+
+  @Test
+  @Order(9)
   public void testFindAllWithoutToken() throws JsonProcessingException {
     RequestSpecification specificationWithoutToken = new RequestSpecBuilder()
         .setBasePath("/api/person/v1")
@@ -355,6 +461,7 @@ public class PersonControllerYmlTest extends AbstractIntegrationTest {
                         ContentType.TEXT
                     )))
         .contentType(TestConfigs.CONTENT_TYPE_YML)
+        .accept(TestConfigs.CONTENT_TYPE_YML)
         .when()
         .get()
         .then()
