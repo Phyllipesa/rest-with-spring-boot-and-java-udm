@@ -55,8 +55,8 @@ public class BookController {
   )
   public ResponseEntity<PagedModel<EntityModel<BookVO>>> findAll(
       @RequestParam(value = "page", defaultValue = "0") Integer page,
-      @RequestParam(value = "size", defaultValue = "5") Integer size,
-      @RequestParam(value = "direction", defaultValue = "5") String direction
+      @RequestParam(value = "size", defaultValue = "3") Integer size,
+      @RequestParam(value = "direction", defaultValue = "asc") String direction
   ) {
     var sortDirection = "desc".equalsIgnoreCase(direction) ? Direction.DESC : Direction.ASC;
     Pageable pageable = PageRequest.of(page, size, Sort.by(sortDirection, "author"));

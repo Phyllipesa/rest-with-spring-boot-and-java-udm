@@ -1,29 +1,25 @@
 package com.phyllipesa.erudio.integrationTests.controller.withxml;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
-
 import com.phyllipesa.erudio.configs.TestConfigs;
 import com.phyllipesa.erudio.integrationTests.testcontainers.AbstractIntegrationTest;
 import com.phyllipesa.erudio.integrationTests.vo.AccountCredentialsVO;
 import com.phyllipesa.erudio.integrationTests.vo.BookVO;
 import com.phyllipesa.erudio.integrationTests.vo.TokenVO;
-
+import com.phyllipesa.erudio.integrationTests.vo.pagedmodels.PagedModelBook;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.filter.log.LogDetail;
 import io.restassured.filter.log.RequestLoggingFilter;
 import io.restassured.filter.log.ResponseLoggingFilter;
 import io.restassured.specification.RequestSpecification;
-
 import org.junit.jupiter.api.*;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
 
 import static io.restassured.RestAssured.given;
 import static org.junit.jupiter.api.Assertions.*;
@@ -205,6 +201,7 @@ public class BookControllerXmlTest extends AbstractIntegrationTest {
         given()
             .spec(specification)
             .contentType(TestConfigs.CONTENT_TYPE_XML)
+            .queryParams("page", 3, "size", 3, "direction", "asc")
             .accept(TestConfigs.CONTENT_TYPE_XML)
             .when()
             .get()
@@ -214,24 +211,11 @@ public class BookControllerXmlTest extends AbstractIntegrationTest {
             .body()
             .asString();
 
-    List<BookVO> books = objectMapper.readValue(content, new TypeReference<List<BookVO>>() {});
+    PagedModelBook wrapper = objectMapper.readValue(content, PagedModelBook.class);
+    var books = wrapper.getContent();
+
     book = books.get(0);
     sdf.applyPattern("yyyy-MM-dd HH:mm:ss.SSS");
-    date = sdf.parse("2017-11-29 13:50:05.878");
-    assertNotNull(book.getId());
-    assertNotNull(book.getAuthor());
-    assertNotNull(book.getTitle());
-    assertNotNull(book.getlaunchDate());
-    assertNotNull(book.getPrice());
-
-    assertEquals(1, book.getId());
-    assertEquals("Michael C. Feathers", book.getAuthor());
-    assertEquals("Working effectively with legacy code", book.getTitle());
-    assertEquals(date.toInstant(), book.getlaunchDate().toInstant());
-    assertEquals(49.0, book.getPrice());
-
-
-    book = books.get(5);
     date = sdf.parse("2017-11-07 15:09:01.674");
     assertNotNull(book.getId());
     assertNotNull(book.getAuthor());
@@ -239,10 +223,74 @@ public class BookControllerXmlTest extends AbstractIntegrationTest {
     assertNotNull(book.getlaunchDate());
     assertNotNull(book.getPrice());
 
-    assertEquals(6, book.getId());
-    assertEquals("Martin Fowler e Kent Beck", book.getAuthor());
-    assertEquals("Refactoring", book.getTitle());
+    assertEquals(13, book.getId());
+    assertEquals("Richard Hunter e George Westerman", book.getAuthor());
+    assertEquals("O verdadeiro valor de TI", book.getTitle());
     assertEquals(date.toInstant(), book.getlaunchDate().toInstant());
-    assertEquals(88.0, book.getPrice());
+    assertEquals(95.0, book.getPrice());
+
+
+    book = books.get(2);
+    date = sdf.parse("2017-11-07 15:09:01.674");
+    assertNotNull(book.getId());
+    assertNotNull(book.getAuthor());
+    assertNotNull(book.getTitle());
+    assertNotNull(book.getlaunchDate());
+    assertNotNull(book.getPrice());
+
+    assertEquals(11, book.getId());
+    assertEquals("Roger S. Pressman", book.getAuthor());
+    assertEquals("Engenharia de Software: uma abordagem profissional", book.getTitle());
+    assertEquals(date.toInstant(), book.getlaunchDate().toInstant());
+    assertEquals(56.0, book.getPrice());
+  }
+
+  @Test
+  @Order(6)
+  public void testHATEAOS() throws JsonProcessingException {
+    var content =
+        given()
+            .spec(specification)
+            .contentType(TestConfigs.CONTENT_TYPE_XML)
+            .accept(TestConfigs.CONTENT_TYPE_XML)
+            .queryParams("page", 0, "size", 3, "direction", "asc")
+            .when()
+            .get()
+            .then()
+            .statusCode(200)
+            .extract()
+            .body()
+            .asString();
+
+    assertTrue(content.contains("<links><rel>self</rel><href>http://localhost:8888/api/book/v1/15</href></links>"));
+    assertTrue(content.contains("<links><rel>self</rel><href>http://localhost:8888/api/book/v1/9</href></links>"));
+    assertTrue(content.contains("<links><rel>self</rel><href>http://localhost:8888/api/book/v1/4</href></links>"));
+
+    assertTrue(content.contains("<links><rel>first</rel><href>http://localhost:8888/api/book/v1?direction=asc&amp;page=0&amp;size=3&amp;sort=author,asc</href></links>"));
+    assertTrue(content.contains("<links><rel>self</rel><href>http://localhost:8888/api/book/v1?page=0&amp;size=3&amp;direction=asc</href></links>"));
+    assertTrue(content.contains("<links><rel>next</rel><href>http://localhost:8888/api/book/v1?direction=asc&amp;page=1&amp;size=3&amp;sort=author,asc</href></links>"));
+    assertTrue(content.contains("<links><rel>last</rel><href>http://localhost:8888/api/book/v1?direction=asc&amp;page=4&amp;size=3&amp;sort=author,asc</href></links>"));
+
+    assertTrue(content.contains("<page><size>3</size><totalElements>15</totalElements><totalPages>5</totalPages><number>0</number></page>"));
+  }
+
+  @Test
+  @Order(7)
+  public void testFindAllWithoutToken() throws JsonProcessingException {
+    RequestSpecification specificationWithoutToken = new RequestSpecBuilder()
+        .setBasePath("/api/book/v1")
+        .setPort(TestConfigs.SERVER_PORT)
+        .addFilter(new RequestLoggingFilter(LogDetail.ALL))
+        .addFilter(new ResponseLoggingFilter(LogDetail.ALL))
+        .build();
+
+    given()
+        .spec(specificationWithoutToken)
+        .contentType(TestConfigs.CONTENT_TYPE_XML)
+        .accept(TestConfigs.CONTENT_TYPE_XML)
+        .when()
+        .get()
+        .then()
+        .statusCode(403);
   }
 }
