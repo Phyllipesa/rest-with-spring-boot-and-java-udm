@@ -1,18 +1,20 @@
-package com.phyllipesa.udm.integrationTests.controller.withjson;
+package com.phyllipesa.udm.integrationTests.controller.withYaml;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.phyllipesa.udm.configs.TestConfigs;
+import com.phyllipesa.udm.integrationTests.controller.withYaml.mapper.YMLMapper;
 import com.phyllipesa.udm.integrationTests.testcontainers.AbstractIntegrationTest;
 import com.phyllipesa.udm.integrationTests.vo.AccountCredentialsVO;
 import com.phyllipesa.udm.integrationTests.vo.BookVO;
 import com.phyllipesa.udm.integrationTests.vo.TokenVO;
-import com.phyllipesa.udm.integrationTests.vo.wrappers.WrapperBookVO;
+import com.phyllipesa.udm.integrationTests.vo.pagedmodels.PagedModelBook;
 import io.restassured.builder.RequestSpecBuilder;
+import io.restassured.config.EncoderConfig;
+import io.restassured.config.RestAssuredConfig;
 import io.restassured.filter.log.LogDetail;
 import io.restassured.filter.log.RequestLoggingFilter;
 import io.restassured.filter.log.ResponseLoggingFilter;
+import io.restassured.http.ContentType;
 import io.restassured.specification.RequestSpecification;
 import org.junit.jupiter.api.*;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -20,15 +22,17 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.TimeZone;
 
 import static io.restassured.RestAssured.given;
 import static org.junit.jupiter.api.Assertions.*;
 
+
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class BookControllerJsonTest extends AbstractIntegrationTest {
+public class BookControllerYmlTest extends AbstractIntegrationTest {
   private static RequestSpecification specification;
-  private static ObjectMapper objectMapper;
+  private static YMLMapper objectMapper;
   private static BookVO book;
   private static Date date;
   private static final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -48,8 +52,7 @@ public class BookControllerJsonTest extends AbstractIntegrationTest {
 
   @BeforeAll
   public static void setup() {
-    objectMapper = new ObjectMapper();
-    objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+    objectMapper = new YMLMapper();
     book = new BookVO();
   }
 
@@ -60,17 +63,26 @@ public class BookControllerJsonTest extends AbstractIntegrationTest {
 
     var accessToken =
         given()
+            .config(
+                RestAssuredConfig
+                    .config()
+                    .encoderConfig(EncoderConfig.encoderConfig()
+                        .encodeContentTypeAs(
+                            TestConfigs.CONTENT_TYPE_YML,
+                            ContentType.TEXT
+                        )))
             .basePath("/auth/signin")
             .port(TestConfigs.SERVER_PORT)
-            .contentType(TestConfigs.CONTENT_TYPE_JSON)
-            .body(user)
+            .contentType(TestConfigs.CONTENT_TYPE_YML)
+            .accept(TestConfigs.CONTENT_TYPE_YML)
+            .body(user, objectMapper)
             .when()
             .post()
             .then()
             .statusCode(200)
             .extract()
             .body()
-            .as(TokenVO.class)
+            .as(TokenVO.class, objectMapper)
             .getAccessToken();
 
     specification = new RequestSpecBuilder()
@@ -87,22 +99,29 @@ public class BookControllerJsonTest extends AbstractIntegrationTest {
   public void testCreate() throws JsonProcessingException {
     mockBook();
 
-    var content =
+    var persistedBook =
         given()
             .spec(specification)
-            .contentType(TestConfigs.CONTENT_TYPE_JSON)
-            .body(book)
+            .config(
+                RestAssuredConfig
+                    .config()
+                    .encoderConfig(EncoderConfig.encoderConfig()
+                        .encodeContentTypeAs(
+                            TestConfigs.CONTENT_TYPE_YML,
+                            ContentType.TEXT
+                        )))
+            .contentType(TestConfigs.CONTENT_TYPE_YML)
+            .accept(TestConfigs.CONTENT_TYPE_YML)
+            .body(book, objectMapper)
             .when()
             .post()
             .then()
             .statusCode(201)
             .extract()
             .body()
-            .asString();
+            .as(BookVO.class, objectMapper);
 
-    BookVO persistedBook = objectMapper.readValue(content, BookVO.class);
     book = persistedBook;
-
     assertNotNull(persistedBook.getId());
     assertNotNull(persistedBook.getAuthor());
     assertNotNull(persistedBook.getTitle());
@@ -121,22 +140,29 @@ public class BookControllerJsonTest extends AbstractIntegrationTest {
   public void testUpdate() throws JsonProcessingException {
     book.setAuthor("Eric Evans");
 
-    var content =
+    var persistedBook =
         given()
             .spec(specification)
-            .contentType(TestConfigs.CONTENT_TYPE_JSON)
-            .body(book)
+            .config(
+                RestAssuredConfig
+                    .config()
+                    .encoderConfig(EncoderConfig.encoderConfig()
+                        .encodeContentTypeAs(
+                            TestConfigs.CONTENT_TYPE_YML,
+                            ContentType.TEXT
+                        )))
+            .contentType(TestConfigs.CONTENT_TYPE_YML)
+            .accept(TestConfigs.CONTENT_TYPE_YML)
+            .body(book, objectMapper)
             .when()
             .put()
             .then()
             .statusCode(200)
             .extract()
             .body()
-            .asString();
+            .as(BookVO.class, objectMapper);
 
-    BookVO persistedBook = objectMapper.readValue(content, BookVO.class);
     book = persistedBook;
-
     assertNotNull(persistedBook.getId());
     assertNotNull(persistedBook.getAuthor());
     assertNotNull(persistedBook.getTitle());
@@ -153,9 +179,18 @@ public class BookControllerJsonTest extends AbstractIntegrationTest {
   @Test
   @Order(3)
   public void testFindById() throws JsonProcessingException {
-    var content =
+    var persistedBook =
         given().spec(specification)
-            .contentType(TestConfigs.CONTENT_TYPE_JSON)
+            .config(
+                RestAssuredConfig
+                    .config()
+                    .encoderConfig(EncoderConfig.encoderConfig()
+                        .encodeContentTypeAs(
+                            TestConfigs.CONTENT_TYPE_YML,
+                            ContentType.TEXT
+                        )))
+            .contentType(TestConfigs.CONTENT_TYPE_YML)
+            .accept(TestConfigs.CONTENT_TYPE_YML)
             .pathParam("id", book.getId())
             .when()
             .get("{id}")
@@ -163,11 +198,9 @@ public class BookControllerJsonTest extends AbstractIntegrationTest {
             .statusCode(200)
             .extract()
             .body()
-            .asString();
+            .as(BookVO.class, objectMapper);
 
-    BookVO persistedBook = objectMapper.readValue(content, BookVO.class);
     book = persistedBook;
-
     assertNotNull(persistedBook.getId());
     assertNotNull(persistedBook.getAuthor());
     assertNotNull(persistedBook.getTitle());
@@ -185,7 +218,16 @@ public class BookControllerJsonTest extends AbstractIntegrationTest {
   @Order(4)
   public void testDelete() throws JsonProcessingException {
     given().spec(specification)
-        .contentType(TestConfigs.CONTENT_TYPE_JSON)
+        .config(
+            RestAssuredConfig
+                .config()
+                .encoderConfig(EncoderConfig.encoderConfig()
+                    .encodeContentTypeAs(
+                        TestConfigs.CONTENT_TYPE_YML,
+                        ContentType.TEXT
+                    )))
+        .contentType(TestConfigs.CONTENT_TYPE_YML)
+        .accept(TestConfigs.CONTENT_TYPE_YML)
         .pathParam("id", book.getId())
         .when()
         .delete("{id}")
@@ -196,25 +238,35 @@ public class BookControllerJsonTest extends AbstractIntegrationTest {
   @Test
   @Order(5)
   public void testFindAll() throws JsonProcessingException, ParseException {
-    var content =
+    var wrapper =
         given()
             .spec(specification)
-            .contentType(TestConfigs.CONTENT_TYPE_JSON)
+            .config(
+                RestAssuredConfig
+                    .config()
+                    .encoderConfig(EncoderConfig.encoderConfig()
+                        .encodeContentTypeAs(
+                            TestConfigs.CONTENT_TYPE_YML,
+                            ContentType.TEXT
+                        )))
+            .contentType(TestConfigs.CONTENT_TYPE_YML)
             .queryParams("page", 3, "size", 3, "direction", "asc")
+            .accept(TestConfigs.CONTENT_TYPE_YML)
             .when()
             .get()
             .then()
             .statusCode(200)
             .extract()
             .body()
-            .asString();
+            .as(PagedModelBook.class, objectMapper);
 
-    WrapperBookVO wrapper = objectMapper.readValue(content, WrapperBookVO.class);
-    var books = wrapper.getEmbedded().getBooks();
+    var books = wrapper.getContent();
 
     book = books.get(0);
     sdf.applyPattern("yyyy-MM-dd HH:mm:ss.SSS");
+    sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
     date = sdf.parse("2017-11-07 15:09:01.674");
+
     assertNotNull(book.getId());
     assertNotNull(book.getAuthor());
     assertNotNull(book.getTitle());
@@ -244,13 +296,21 @@ public class BookControllerJsonTest extends AbstractIntegrationTest {
   }
 
   @Test
-  @Order(6)
-  public void testHATEAOS() throws JsonProcessingException, ParseException {
-    var content =
+  @Order(8)
+  public void testHATEAOS() throws JsonProcessingException {
+    var wrapper =
         given()
             .spec(specification)
-            .contentType(TestConfigs.CONTENT_TYPE_JSON)
-            .accept(TestConfigs.CONTENT_TYPE_JSON)
+            .config(
+                RestAssuredConfig
+                    .config()
+                    .encoderConfig(EncoderConfig.encoderConfig()
+                        .encodeContentTypeAs(
+                            TestConfigs.CONTENT_TYPE_YML,
+                            ContentType.TEXT
+                        )))
+            .contentType(TestConfigs.CONTENT_TYPE_YML)
+            .accept(TestConfigs.CONTENT_TYPE_YML)
             .queryParams("page", 0, "size", 3, "direction", "asc")
             .when()
             .get()
@@ -260,20 +320,42 @@ public class BookControllerJsonTest extends AbstractIntegrationTest {
             .body()
             .asString();
 
-    assertTrue(content.contains("\"_links\":{\"self\":{\"href\":\"http://localhost:8888/api/book/v1/15\"}}}"));
-    assertTrue(content.contains("\"_links\":{\"self\":{\"href\":\"http://localhost:8888/api/book/v1/9\"}}}"));
-    assertTrue(content.contains("\"_links\":{\"self\":{\"href\":\"http://localhost:8888/api/book/v1/4\"}}}"));
+    assertTrue(wrapper.contains(
+        "rel: \"self\"\n" +
+            "    href: \"http://localhost:8888/api/book/v1/15\""));
+    assertTrue(wrapper.contains(
+        "rel: \"self\"\n" +
+            "    href: \"http://localhost:8888/api/book/v1/9\""));
+    assertTrue(wrapper.contains(
+        "rel: \"self\"\n" +
+            "    href: \"http://localhost:8888/api/book/v1/4\""));
 
-    assertTrue(content.contains("\"first\":{\"href\":\"http://localhost:8888/api/book/v1?direction=asc&page=0&size=3&sort=author,asc\"}"));
-    assertTrue(content.contains("\"self\":{\"href\":\"http://localhost:8888/api/book/v1?page=0&size=3&direction=asc\"}"));
-    assertTrue(content.contains("\"next\":{\"href\":\"http://localhost:8888/api/book/v1?direction=asc&page=1&size=3&sort=author,asc\"}"));
-    assertTrue(content.contains("\"last\":{\"href\":\"http://localhost:8888/api/book/v1?direction=asc&page=4&size=3&sort=author,asc\"}}"));
+    assertTrue(wrapper.contains(
+        "rel: \"first\"\n" +
+            "  href: \"http://localhost:8888/api/book/v1?direction=asc&page=0&size=3&sort=author,asc\""));
 
-    assertTrue(content.contains("\"page\":{\"size\":3,\"totalElements\":15,\"totalPages\":5,\"number\":0}}"));
+    assertTrue(wrapper.contains(
+        "rel: \"self\"\n" +
+            "  href: \"http://localhost:8888/api/book/v1?page=0&size=3&direction=asc\""));
+
+    assertTrue(wrapper.contains(
+        "rel: \"next\"\n" +
+            "  href: \"http://localhost:8888/api/book/v1?direction=asc&page=1&size=3&sort=author,asc\""));
+
+    assertTrue(wrapper.contains(
+        "rel: \"last\"\n" +
+            "  href: \"http://localhost:8888/api/book/v1?direction=asc&page=4&size=3&sort=author,asc\""));
+
+    assertTrue(wrapper.contains(
+        "page:\n" +
+            "  size: 3\n" +
+            "  totalElements: 15\n" +
+            "  totalPages: 5\n" +
+            "  number: 0"));
   }
 
   @Test
-  @Order(7)
+  @Order(8)
   public void testFindAllWithoutToken() throws JsonProcessingException {
     RequestSpecification specificationWithoutToken = new RequestSpecBuilder()
         .setBasePath("/api/book/v1")
@@ -284,7 +366,15 @@ public class BookControllerJsonTest extends AbstractIntegrationTest {
 
     given()
         .spec(specificationWithoutToken)
-        .contentType(TestConfigs.CONTENT_TYPE_JSON)
+        .config(
+            RestAssuredConfig
+                .config()
+                .encoderConfig(EncoderConfig.encoderConfig()
+                    .encodeContentTypeAs(
+                        TestConfigs.CONTENT_TYPE_YML,
+                        ContentType.TEXT
+                    )))
+        .contentType(TestConfigs.CONTENT_TYPE_YML)
         .when()
         .get()
         .then()

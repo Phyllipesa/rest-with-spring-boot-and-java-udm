@@ -19,7 +19,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.temporal.ChronoUnit;
 import java.util.Date;
+import java.util.TimeZone;
 
 import static io.restassured.RestAssured.given;
 import static org.junit.jupiter.api.Assertions.*;
@@ -216,7 +218,9 @@ public class BookControllerXmlTest extends AbstractIntegrationTest {
 
     book = books.get(0);
     sdf.applyPattern("yyyy-MM-dd HH:mm:ss.SSS");
+    sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
     date = sdf.parse("2017-11-07 15:09:01.674");
+
     assertNotNull(book.getId());
     assertNotNull(book.getAuthor());
     assertNotNull(book.getTitle());
