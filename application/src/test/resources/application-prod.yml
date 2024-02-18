@@ -1,0 +1,40 @@
+server:
+  port: 8888
+cors:
+  originPatterns: http://localhost:3000,http://localhost:8080,https://phyllipesa.com.br
+file:
+  upload-dir: /home/runner/work/rest-with-spring-boot-and-java-udm/UploadDir
+security:
+  jwt:
+    token:
+      secret-key: 53ccr37
+      expire-length: 3600000
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    open-in-view: true
+    hibernate:
+      ddl-auto: none
+    show-sql: false
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: "UTC"
+  servlet:
+    multipart:
+      enabled: true
+      file-size-threshold: 2KB
+      max-file-size: 200MB
+      max-request-size: 215MB
+spring-doc:
+  pathsToMatch:
+    - /auth/**
+    - /api/**/v1/**
+  swagger-ui:
+    user-root-path: true
+
+# Configuração específica do Flyway
+flyway:
+  enabled: true
+  locations: classpath:db.migration
