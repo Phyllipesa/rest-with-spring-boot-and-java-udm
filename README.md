@@ -3,6 +3,7 @@
 Este é um projeto desenvolvido durante o curso de Desenvolvimento de API's.
 O curso aborda os fundamentos e práticas essenciais para criar API's RESTful utilizando o Spring Boot 3.2.0 e a linguagem Java 21.
 
+---
 
 ## API de Gerenciamento de Pessoas e Livros
 
@@ -17,8 +18,9 @@ dos dados manipulados. Com endpoints dedicados para cada funcionalidade, é fác
 API em diferentes sistemas e aplicações, proporcionando uma experiência de desenvolvimento 
 simplificada e escalável.
 
+---
 
-## Habilidades exercitadas:
+## Habilidades exercitadas
 
 - Desenvolvimento de API's RESTful do zero absoluto
 - Boas práticas na criação de API's
@@ -39,75 +41,91 @@ simplificada e escalável.
 - Consumo de API's de terceiros
 - Conceitos básicos de Docker e Docker Compose
 
+---
 
-### Instruções de Uso
+### Requisitos
+Certifique-se de ter o Java, Maven e Docker instalados em sua máquina.
 
-1. Clone o projeto 
+---
 
+### Executando a Aplicação
+
+<details>
+<summary>Aplicação</summary>
+<br>
+
+1. Clone o projeto
 ```bash
   git@github.com:Phyllipesa/rest-with-spring-boot-and-java-udm.git
 ```
 
-2. Entre no diretorio
-
+2. Entre no diretório
 ```bash
-  cd rest-with-spring-boot-and-java-udm/
+  cd rest-with-spring-boot-and-java-udm/application
 ```
 
-3. Execute o comando
+3. Compile o projeto
+```bash
+  mvn package -DskipTests
+```
 
+4. Volte para o diretório anterior
+```bash
+  cd ..
+```
+
+5. Execute o comando
 ```bash
   docker compose up -d --build
 ```
 
-4. Acesse a documentação da API gerada pelo Swagger para explorar os endpoints disponíveis.
+6. A aplicação será iniciada no endereço 'http://localhost:80'.
 
+
+7. Acesse a documentação da API no swagger no endereço
 ```bash
   http://localhost/swagger-ui/index.html
 ```
 
-5. Utilize o Postman ou outra ferramenta similar para realizar requisições e testar a API.
+PS: Você pode utilizar as configurações de ENV e Collections fornecidas na pasta "docs" com o Postman ou outra ferramenta similar.
+</details>
 
+<details>
+<summary>Testes</summary>
+<br>
 
-### Executando os testes
-
-1. Abra o arquivo __application.yml__ do diretorio a seguir:
+1. Abra o arquivo __application.yml__ do diretório a seguir
 
 ```bash
   application/src/test/resources
 ```
 
-2. Abra o arquivo e mude o valor da variavel __active__ para "test"
+2. Altere o conteúdo do arquivo application.yml que se encontra no diretório __/src/main/resources__ para
 
   ```bash
   spring:
     profiles:
-      active: test 
+      active: test
   ```
 
 3. Crie uma nova pasta em um diretório a sua escolha, ela servirá para armazenar os arquivos dos endpoints de upload e download.
 
-4. Copie o caminho absoluto da pasta criada.
 
-5. Abra o arquivo __application-test.yml__ do diretorio a seguir.
-
-```bash
-  application/src/test/resources
-```
-
-6. Cole o caminho absoluto no local especificado abaixo:
+4. Abra o arquivo __application-test.yml__ que está no diretório __application/src/test/resources__ e substitua o valor da váriavel __upload-dir__ pelo caminho absoluto do diretório de armazenamento criado.
 
 ```bash
   file:
-  upload-dir: "cole aqui o caminho da pasta"
+    upload-dir: /exempo/de/caminho
 ```
 
-7. Execute o comando
+5. Certifique-se de estar no diretório __application__ e use o comando
 
 ```bash
   mvn test
 ```
+</details>
 
+---
 
 ### Tecnologias
 
@@ -124,4 +142,3 @@ simplificada e escalável.
 ![IntelliJ IDEA](https://img.shields.io/badge/IntelliJIDEA-000000.svg?style=for-the-badge&logo=intellij-idea&logoColor=white)
 ![JWT](https://img.shields.io/badge/JWT-black?style=for-the-badge&logo=JSON%20web%20tokens)
 ![GitHub](https://img.shields.io/badge/github-%23121011.svg?style=for-the-badge&logo=github&logoColor=white)
-
