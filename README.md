@@ -54,27 +54,27 @@ Certifique-se de ter o Java, Maven e Docker instalados em sua máquina.
 <summary>Aplicação</summary>
 <br>
 
-1. Clone o projeto
+1. Clone o projeto.
 ```bash
   git@github.com:Phyllipesa/rest-with-spring-boot-and-java-udm.git
 ```
 
-2. Entre no diretório
+2. Entre no diretório.
 ```bash
   cd rest-with-spring-boot-and-java-udm/application
 ```
 
-3. Compile o projeto
+3. Compile o projeto.
 ```bash
   mvn package -DskipTests
 ```
 
-4. Volte para o diretório anterior
+4. Volte para o diretório anterior.
 ```bash
   cd ..
 ```
 
-5. Execute o comando
+5. Execute o comando.
 ```bash
   docker compose up -d --build
 ```
@@ -82,7 +82,7 @@ Certifique-se de ter o Java, Maven e Docker instalados em sua máquina.
 6. A aplicação será iniciada no endereço 'http://localhost:80'.
 
 
-7. Acesse a documentação da API no swagger no endereço
+7. Acesse a documentação da API no swagger.
 ```bash
   http://localhost/swagger-ui/index.html
 ```
@@ -94,13 +94,13 @@ PS: Você pode utilizar as configurações de ENV e Collections fornecidas na pa
 <summary>Testes</summary>
 <br>
 
-1. Abra o arquivo __application.yml__ do diretório a seguir
+1. Abra o arquivo __application.yml__ do diretório a seguir:
 
 ```bash
   application/src/test/resources
 ```
 
-2. Altere o conteúdo do arquivo application.yml que se encontra no diretório __/src/main/resources__ para
+2. Altere o conteúdo do arquivo application.yml que se encontra no diretório __/src/main/resources__ para:
 
   ```bash
   spring:
@@ -137,8 +137,6 @@ PS: Você pode utilizar as configurações de ENV e Collections fornecidas na pa
 ![Swagger](https://img.shields.io/badge/-Swagger-%23Clojure?style=for-the-badge&logo=swagger&logoColor=white)
 ![Java](https://img.shields.io/badge/java-%23ED8B00.svg?style=for-the-badge&logo=openjdk&logoColor=white)
 ![Postman](https://img.shields.io/badge/Postman-FF6C37?style=for-the-badge&logo=postman&logoColor=white)
-![Git](https://img.shields.io/badge/git-%23F05033.svg?style=for-the-badge&logo=git&logoColor=white)
 ![Apache Maven](https://img.shields.io/badge/Apache%20Maven-C71A36?style=for-the-badge&logo=Apache%20Maven&logoColor=white)
 ![IntelliJ IDEA](https://img.shields.io/badge/IntelliJIDEA-000000.svg?style=for-the-badge&logo=intellij-idea&logoColor=white)
 ![JWT](https://img.shields.io/badge/JWT-black?style=for-the-badge&logo=JSON%20web%20tokens)
-![GitHub](https://img.shields.io/badge/github-%23121011.svg?style=for-the-badge&logo=github&logoColor=white)
